@@ -1,7 +1,7 @@
 // ── To-Do PWA Service Worker ──────────────────────────────────────────────────
 // Cache name is versioned — update CACHE_VERSION whenever todo.html changes
 // so the old cache is cleared and the new files are fetched fresh.
-const CACHE_VERSION = 'todo-v1.5';
+const CACHE_VERSION = 'todo-v1.6';
 const ASSETS = [
   './index.html',
   './manifest.json',
