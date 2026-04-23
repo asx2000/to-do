@@ -9,7 +9,6 @@
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5b5ef4" />
-  <!-- iOS standalone mode (hides address bar) -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="To-Do" />
@@ -191,12 +190,69 @@
       color: var(--text3);
     }
 
+    /* ── Alert Banners ── */
+    .alert-banners {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 16px 0;
+    }
+    .alert-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid;
+      animation: bannerSlideIn 0.3s ease;
+    }
+    .alert-banner.pre { background: var(--high-soft); border-color: var(--high); }
+    .alert-banner.now { background: var(--critical-soft); border-color: var(--critical); }
+    .alert-banner-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .alert-banner-icon.pre { background: var(--high); }
+    .alert-banner-icon.now { background: var(--critical); }
+    .alert-banner-text { flex: 1; min-width: 0; }
+    .alert-banner-title {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .alert-banner.pre .alert-banner-title { color: var(--high); }
+    .alert-banner.now .alert-banner-title { color: var(--critical); }
+    .alert-banner-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    .alert-banner-dismiss {
+      background: none;
+      border: none;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--text3);
+      cursor: pointer;
+      padding: 0 2px;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .alert-banner-dismiss:active { color: var(--text2); }
+    @keyframes bannerSlideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
     /* ── Task List ── */
     .list-area {
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 16px 16px calc(var(--safe-bottom) + 80px);
+      padding: 12px 16px calc(var(--safe-bottom) + 80px);
     }
 
     .section-label {
@@ -233,20 +289,18 @@
     }
     .task-card:active:not(.done) { transform: scale(0.985); }
     .task-card.done { opacity: var(--done-opacity); }
+    .task-card.is-recurring:not(.done) { border-left: 4px solid var(--accent); }
 
-    /* ── Overdue / Alert pulsing state ── */
+    /* ── Overdue / Alert pulsing ── */
     @keyframes alertGlow {
       0%   { box-shadow: 0 0 0 0   rgba(255, 59, 48, 0.55), var(--shadow); }
       60%  { box-shadow: 0 0 0 7px rgba(255, 59, 48, 0),    var(--shadow); }
       100% { box-shadow: 0 0 0 0   rgba(255, 59, 48, 0),    var(--shadow); }
     }
-
     .task-card.alert-pulse:not(.done) {
       border-color: var(--critical);
       animation: alertGlow 2s ease-out infinite;
     }
-
-    /* Alert badge on the card */
     .alert-dot {
       position: absolute;
       top: 10px;
@@ -257,7 +311,6 @@
       border-radius: 50%;
       animation: dotBlink 1.4s ease-in-out infinite;
     }
-
     @keyframes dotBlink {
       0%, 100% { opacity: 1; transform: scale(1); }
       50%       { opacity: 0.3; transform: scale(0.75); }
@@ -274,7 +327,7 @@
 
     .task-main {
       flex: 1;
-      padding: 15px 16px;
+      padding: 13px 14px;
       min-width: 0;
     }
 
@@ -314,21 +367,46 @@
     }
 
     .task-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 500;
       color: var(--text);
       word-break: break-word;
       flex: 1;
       line-height: 1.35;
-      transition: text-decoration 0.15s;
     }
     .done .task-title { text-decoration: line-through; color: var(--text3); }
 
     .task-notes {
       font-size: 13px;
       color: var(--text2);
-      margin-top: 6px;
+      margin-top: 5px;
       line-height: 1.5;
+    }
+
+    /* ── Task Badges ── */
+    .task-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+    .tbadge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+    .tbadge-rec      { background: var(--accent-soft); color: var(--accent); }
+    .tbadge-time     { background: #e6f4ea; color: #1e6b3e; }
+    .tbadge-due      { background: var(--surface2); color: var(--text2); }
+    .tbadge-due.overdue { background: var(--critical-soft); color: var(--critical); }
+    .tbadge-due.soon    { background: var(--high-soft); color: var(--high); }
+    .tbadge-reminders   { background: #fff4e0; color: #a05000; }
+
+    @media (prefers-color-scheme: dark) {
+      .tbadge-time      { background: #1a3d24; color: #81c784; }
+      .tbadge-reminders { background: #3d2c08; color: #ffb74d; }
     }
 
     /* Done section toggle */
@@ -408,6 +486,8 @@
 
     input[type="text"],
     input[type="date"],
+    input[type="time"],
+    input[type="number"],
     textarea,
     select {
       width: 100%;
@@ -425,9 +505,12 @@
     }
     input[type="text"]:focus,
     input[type="date"]:focus,
+    input[type="time"]:focus,
+    input[type="number"]:focus,
     textarea:focus,
     select:focus { border-color: var(--accent); }
 
+    input[type="number"] { width: 90px; }
     textarea { resize: none; height: 72px; }
 
     select {
@@ -469,6 +552,223 @@
     }
     .auto-badge span { color: var(--accent); font-weight: 600; }
 
+    /* ── Recurring Task Section ── */
+    .rec-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+    }
+    .rec-toggle-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .toggle-switch {
+      width: 51px;
+      height: 31px;
+      border-radius: 16px;
+      background: var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+      border: none;
+    }
+    .toggle-switch.on { background: var(--accent); }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 27px;
+      height: 27px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+    .toggle-switch.on::after { transform: translateX(20px); }
+
+    .rec-section {
+      margin-top: 10px;
+      padding: 14px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .rec-sub-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 7px;
+    }
+
+    .rec-pattern-grid {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .rec-pattern-opt {
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .rec-pattern-opt.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .day-of-week-grid {
+      display: flex;
+      gap: 5px;
+    }
+    .dow-opt {
+      flex: 1;
+      padding: 7px 2px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dow-opt.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .time-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .time-input-row input[type="time"] {
+      width: 130px;
+      flex-shrink: 0;
+    }
+    .time-input-hint {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    /* ── Reminders Section ── */
+    .reminders-section {
+      padding: 14px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+    }
+    .reminders-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .reminders-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .btn-add-reminder {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 3px 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .reminder-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .reminder-pill {
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      gap: 10px;
+    }
+    .reminder-pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .reminder-pill-label {
+      flex: 1;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .reminder-pill-remove {
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .reminder-pill-remove:active { color: var(--critical); }
+    .no-reminders-hint {
+      font-size: 13px;
+      color: var(--text3);
+      text-align: center;
+      padding: 6px 0;
+    }
+    .reminder-picker-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .reminder-picker-row select {
+      flex: 1;
+      font-size: 14px;
+      padding: 10px 32px 10px 12px;
+    }
+    .btn-reminder-confirm {
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+    }
+    .btn-reminder-confirm:active { opacity: 0.85; }
+
     /* ── Modal action rows ── */
     .modal-actions {
       display: flex;
@@ -476,7 +776,6 @@
       margin-top: 24px;
     }
 
-    /* Divider above modal actions when editing */
     .modal-divider {
       border: none;
       border-top: 1px solid var(--border);
@@ -684,6 +983,7 @@
   </header>
 
   <div class="filter-bar" id="filterBar"></div>
+  <div class="alert-banners" id="alertBanners"></div>
   <div class="list-area" id="listArea"></div>
 </div>
 
@@ -727,6 +1027,40 @@
       <div class="auto-badge" id="autoBadge"></div>
     </div>
 
+    <!-- Recurring Task -->
+    <div class="form-group">
+      <div class="rec-toggle-row">
+        <span class="rec-toggle-label">Recurring task</span>
+        <button class="toggle-switch" id="recToggleBtn" onclick="toggleRecurring()" aria-label="Toggle recurring"></button>
+      </div>
+      <div id="recSection" style="display:none"></div>
+    </div>
+
+    <!-- Lead-time Reminders — shown when due date is set -->
+    <div class="form-group" id="remindersGroup" style="display:none">
+      <label>Reminders <span style="font-weight:400;text-transform:none;letter-spacing:0">before due date</span></label>
+      <div class="reminders-section">
+        <div class="reminders-header">
+          <span class="reminders-title">Alert me ahead of time</span>
+          <button class="btn-add-reminder" id="addReminderBtn" onclick="showReminderPicker()">+ Add</button>
+        </div>
+        <div id="reminderPills" class="reminder-pills"></div>
+        <div id="reminderPickerRow" class="reminder-picker-row" style="display:none">
+          <select id="reminderSelect">
+            <option value="0">Same day</option>
+            <option value="1">1 day before</option>
+            <option value="2">2 days before</option>
+            <option value="3">3 days before</option>
+            <option value="4">4 days before</option>
+            <option value="5">5 days before</option>
+            <option value="7">1 week before</option>
+            <option value="14">2 weeks before</option>
+          </select>
+          <button class="btn-reminder-confirm" onclick="confirmAddReminder()">Add</button>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group">
       <label>Notes (optional)</label>
       <textarea id="fNotes" placeholder="Any extra details…"></textarea>
@@ -737,7 +1071,7 @@
       <button class="btn-save" id="taskSaveBtn">Save Task</button>
     </div>
 
-    <!-- Delete button — only visible when editing an existing task -->
+    <!-- Delete button — only visible when editing -->
     <button class="btn-delete-modal" id="taskDeleteBtn" style="display:none" onclick="deleteFromModal()">
       🗑️ Delete Task
     </button>
@@ -760,6 +1094,11 @@
     </div>
 
     <div class="settings-section">
+      <h3>Notifications</h3>
+      <button class="btn-sm" style="width:100%;text-align:center" onclick="requestNotifPermission().then(ok => snack(ok ? '✓ Notifications enabled' : 'Notifications blocked — check browser settings'))">Enable Notifications</button>
+    </div>
+
+    <div class="settings-section">
       <h3>Completed Tasks</h3>
       <button class="btn-danger" onclick="clearDone()">Clear All Completed</button>
     </div>
@@ -776,7 +1115,7 @@
 
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
-const VERSION = '1.3';
+const VERSION = '1.4';
 
 // ── State ────────────────────────────────────────────────────────────────────
 let tasks = [];
@@ -786,7 +1125,21 @@ let editingId = null;
 let selectedUrgency = 'medium';
 let doneCollapsed = false;
 
+// Modal recurring/reminder state
+let isRecurring = false;
+let selectedRecurrence = 'daily';
+let selectedDayOfWeek = 1;
+let selectedDayOfMonth = 1;
+let modalReminders = [];
+let reminderPickerVisible = false;
+
+// In-app alert banners
+let activeBanners = [];
+
 const DEFAULT_CATS = ['Work', 'Personal', 'Health', 'Finance', 'Other'];
+const REC_LABELS   = { daily: 'Daily', weekdays: 'Weekdays', weekly: 'Weekly', monthly: 'Monthly' };
+const DOW_SHORT    = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const REM_COLORS   = ['#5b5ef4', '#ff9500', '#ff3b30', '#34c759', '#af52de', '#007aff'];
 
 // ── Persistence ──────────────────────────────────────────────────────────────
 function save() {
@@ -805,28 +1158,19 @@ function load() {
 }
 
 // ── Migration ─────────────────────────────────────────────────────────────────
-// Safe upgrade path: runs on every launch, only acts when stored version differs.
-// Add new `if (prev < 'x.x')` blocks here as the data model evolves — never
-// delete old ones, so users jumping multiple versions are handled correctly.
 function migrate() {
   const prev = localStorage.getItem('todo_version') || '1.0';
   if (prev === VERSION) return;
 
   // v1.0 → v1.1: ensure every task has a createdAt field
   if (prev < '1.1') {
-    tasks.forEach(t => {
-      if (!t.createdAt) t.createdAt = new Date().toISOString();
-    });
+    tasks.forEach(t => { if (!t.createdAt) t.createdAt = new Date().toISOString(); });
   }
-
-  // v1.1 → v1.2: ensure every task has an urgency field (default 'medium')
+  // v1.1 → v1.2: ensure every task has an urgency field
   if (prev < '1.2') {
-    tasks.forEach(t => {
-      if (!t.urgency) t.urgency = 'medium';
-    });
+    tasks.forEach(t => { if (!t.urgency) t.urgency = 'medium'; });
   }
-
-  // v1.2 → v1.3: assign sortOrder to active tasks based on urgency sort
+  // v1.2 → v1.3: assign sortOrder to active tasks
   if (prev < '1.3') {
     const activeTasks = tasks.filter(t => !t.completed).sort((a, b) => {
       const uo = URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency];
@@ -838,8 +1182,14 @@ function migrate() {
     });
     activeTasks.forEach((t, i) => { t.sortOrder = i; });
   }
-
-  // ── Add future migrations above this line ──
+  // v1.3 → v1.4: add recurring/reminder fields
+  if (prev < '1.4') {
+    tasks.forEach(t => {
+      if (!t.reminders)   t.reminders   = [];
+      if (!t.firedDates)  t.firedDates  = {};
+      if (t.recurring === undefined) t.recurring = false;
+    });
+  }
 
   save();
   localStorage.setItem('todo_version', VERSION);
@@ -849,6 +1199,24 @@ function migrate() {
 // ── Utilities ────────────────────────────────────────────────────────────────
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function subtractDays(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() - n);
+  return d.toISOString().slice(0, 10);
+}
+
+function formatTime12(timeStr) {
+  if (!timeStr) return '';
+  const [h, m] = timeStr.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
 function daysUntil(dateStr) {
@@ -871,7 +1239,6 @@ const URGENCY_ICON  = { critical: '🔴', high: '🟠', medium: '🟡', low: '�
 const URGENCY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
 
 function isOverdueAlert(task) {
-  // Pulsing alert: has a due date, due date is today or past, and not completed
   if (task.completed || !task.dueDate) return false;
   return daysUntil(task.dueDate) <= 0;
 }
@@ -894,10 +1261,146 @@ function snack(msg, ms = 2200) {
   setTimeout(() => el.classList.remove('show'), ms);
 }
 
+// ── Recurring Logic ───────────────────────────────────────────────────────────
+function isRecurringToday(task) {
+  const dow = new Date().getDay(); // 0=Sun
+  const dom = new Date().getDate();
+  switch (task.recurrence) {
+    case 'daily':    return true;
+    case 'weekdays': return dow >= 1 && dow <= 5;
+    case 'weekly':   return dow === (task.alertDayOfWeek !== undefined ? task.alertDayOfWeek : dow);
+    case 'monthly':  return dom === (task.alertDayOfMonth || dom);
+    default:         return false;
+  }
+}
+
+function shouldResetRecurring(task) {
+  if (!task.recurring || !task.lastCompletedDate) return false;
+  const today = todayStr();
+  if (task.lastCompletedDate >= today) return false;
+  const dow = new Date().getDay();
+  switch (task.recurrence) {
+    case 'daily':    return true;
+    case 'weekdays': return dow >= 1 && dow <= 5;
+    case 'weekly': {
+      const days = Math.floor((new Date(today) - new Date(task.lastCompletedDate)) / 86400000);
+      return days >= 7;
+    }
+    case 'monthly': {
+      const last = new Date(task.lastCompletedDate);
+      const now  = new Date(today);
+      return now.getMonth() !== last.getMonth() || now.getFullYear() !== last.getFullYear();
+    }
+    default: return true;
+  }
+}
+
+function autoResetRecurring() {
+  let changed = false;
+  tasks.forEach(t => {
+    if (t.recurring && t.completed && shouldResetRecurring(t)) {
+      t.completed = false;
+      t.lastCompletedDate = null;
+      changed = true;
+    }
+  });
+  if (changed) save();
+}
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+async function requestNotifPermission() {
+  if (!('Notification' in window)) return false;
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') return false;
+  const result = await Notification.requestPermission();
+  return result === 'granted';
+}
+
+function sendNotification(title, body) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try { new Notification(title, { body, icon: 'icon.svg', badge: 'icon.svg' }); }
+  catch(e) { console.warn('Notification failed', e); }
+}
+
+// ── In-App Alert Banners ──────────────────────────────────────────────────────
+function addBanner(id, title, sub, type) {
+  if (activeBanners.find(b => b.id === id)) return;
+  activeBanners.push({ id, title, sub, type });
+  renderBanners();
+}
+
+function dismissBanner(id) {
+  activeBanners = activeBanners.filter(b => b.id !== id);
+  renderBanners();
+}
+
+function renderBanners() {
+  const area = document.getElementById('alertBanners');
+  if (!area) return;
+  if (activeBanners.length === 0) { area.innerHTML = ''; return; }
+  area.innerHTML = activeBanners.map(b => `
+    <div class="alert-banner ${b.type}">
+      <div class="alert-banner-icon ${b.type}">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path d="M8 4v4l2.5 2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="8" cy="8" r="6" stroke="#fff" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="alert-banner-text">
+        <div class="alert-banner-title">${escHtml(b.title)}</div>
+        <div class="alert-banner-sub">${escHtml(b.sub)}</div>
+      </div>
+      <button class="alert-banner-dismiss" onclick="dismissBanner('${b.id}')" aria-label="Dismiss">×</button>
+    </div>`).join('');
+}
+
+// ── Scheduler ────────────────────────────────────────────────────────────────
+function checkScheduler() {
+  const now   = new Date();
+  const today = todayStr();
+  const hhmm  = now.toTimeString().slice(0, 5); // 'HH:MM'
+  let changed = false;
+
+  tasks.filter(t => !t.completed).forEach(task => {
+    if (!task.firedDates) task.firedDates = {};
+
+    // 1. Recurring task alert time
+    if (task.recurring && task.alertTime && isRecurringToday(task)) {
+      const key = 'alert';
+      if (task.firedDates[key] !== today && hhmm === task.alertTime) {
+        const sub = `${REC_LABELS[task.recurrence] || 'Recurring'} · ${formatTime12(task.alertTime)}`;
+        addBanner(`${task.id}-${key}-${today}`, task.title, sub, 'now');
+        sendNotification(task.title, sub);
+        task.firedDates[key] = today;
+        changed = true;
+      }
+    }
+
+    // 2. Lead-time reminders (N days before due date)
+    if (task.dueDate && task.reminders && task.reminders.length > 0) {
+      task.reminders.forEach(rem => {
+        const fireDate = subtractDays(task.dueDate, rem.amount);
+        const key = 'rem-' + rem.id;
+        if (task.firedDates[key] !== today && fireDate === today) {
+          const daysText = rem.amount === 0 ? 'due today' : `due in ${rem.amount} day${rem.amount !== 1 ? 's' : ''}`;
+          const sub = `"${task.title}" is ${daysText}`;
+          addBanner(`${task.id}-${key}-${today}`, '⏰ ' + task.title, sub, 'pre');
+          sendNotification('Reminder: ' + task.title, sub);
+          task.firedDates[key] = today;
+          changed = true;
+        }
+      });
+    }
+  });
+
+  if (changed) save();
+}
+
 // ── Rendering ────────────────────────────────────────────────────────────────
 function render() {
   renderFilterBar();
   renderList();
+  renderBanners();
   updateSubtitle();
   initDnD();
 }
@@ -905,7 +1408,9 @@ function render() {
 function updateSubtitle() {
   const active = tasks.filter(t => !t.completed);
   const el = document.getElementById('subtitle');
-  el.textContent = active.length === 0 ? 'All done ✓' : `${active.length} task${active.length !== 1 ? 's' : ''} remaining`;
+  el.textContent = active.length === 0
+    ? 'All done ✓'
+    : `${active.length} task${active.length !== 1 ? 's' : ''} remaining`;
 }
 
 function renderFilterBar() {
@@ -914,10 +1419,16 @@ function renderFilterBar() {
   tasks.filter(t => !t.completed).forEach(t => {
     counts[t.category] = (counts[t.category] || 0) + 1;
   });
-  const totalActive = tasks.filter(t => !t.completed).length;
+  const totalActive    = tasks.filter(t => !t.completed).length;
+  const recurringCount = tasks.filter(t => !t.completed && t.recurring).length;
 
   const allActive = activeFilter === 'all';
   let html = `<div class="pill ${allActive ? 'active' : ''}" onclick="setFilter('all')">All<span class="pill-count">${totalActive}</span></div>`;
+
+  if (recurringCount > 0) {
+    const sel = activeFilter === '__recurring__';
+    html += `<div class="pill ${sel ? 'active' : ''}" onclick="setFilter('__recurring__')">↻ Recurring<span class="pill-count">${recurringCount}</span></div>`;
+  }
 
   categories.forEach(cat => {
     const sel = activeFilter === cat;
@@ -930,15 +1441,17 @@ function renderFilterBar() {
 
 function renderList() {
   const area = document.getElementById('listArea');
-  let filtered = tasks.filter(t => activeFilter === 'all' || t.category === activeFilter);
+  let filtered = tasks.filter(t => {
+    if (activeFilter === 'all')          return true;
+    if (activeFilter === '__recurring__') return t.recurring;
+    return t.category === activeFilter;
+  });
 
   const active = filtered.filter(t => !t.completed)
     .sort((a, b) => {
-      // Use manual sortOrder if assigned
       if (a.sortOrder !== undefined && b.sortOrder !== undefined) return a.sortOrder - b.sortOrder;
       if (a.sortOrder !== undefined) return 1;
       if (b.sortOrder !== undefined) return -1;
-      // Fall back to urgency auto-sort
       const uo = URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency];
       if (uo !== 0) return uo;
       if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);
@@ -972,12 +1485,29 @@ function renderList() {
 }
 
 function taskCardHTML(task) {
-  const due = dueLabel(task.dueDate);
+  const due     = dueLabel(task.dueDate);
   const checked = task.completed;
-  const alert = isOverdueAlert(task);
+  const alert   = isOverdueAlert(task);
+  const isRec   = task.recurring && !checked;
+
+  // Build badge row
+  let badges = '';
+  if (isRec) {
+    badges += `<span class="tbadge tbadge-rec">↻ ${REC_LABELS[task.recurrence] || 'Recurring'}</span>`;
+    if (task.alertTime) {
+      badges += `<span class="tbadge tbadge-time">${formatTime12(task.alertTime)}</span>`;
+    }
+  }
+  if (due && !checked) {
+    badges += `<span class="tbadge tbadge-due ${due.cls}">${due.text}</span>`;
+  }
+  if (task.reminders && task.reminders.length > 0 && !checked) {
+    badges += `<span class="tbadge tbadge-reminders">🔔 ${task.reminders.length} reminder${task.reminders.length !== 1 ? 's' : ''}</span>`;
+  }
+  const badgesHtml = badges ? `<div class="task-badges">${badges}</div>` : '';
 
   return `
-    <div class="task-card ${checked ? 'done' : ''} ${alert ? 'alert-pulse' : ''}" id="card-${task.id}" onclick="openEdit('${task.id}')"${!checked ? ' draggable="true"' : ''}>
+    <div class="task-card ${checked ? 'done' : ''} ${alert ? 'alert-pulse' : ''} ${isRec ? 'is-recurring' : ''}" id="card-${task.id}" onclick="openEdit('${task.id}')"${!checked ? ' draggable="true"' : ''}>
       ${alert ? '<div class="alert-dot"></div>' : ''}
       <div class="urgency-bar ${task.urgency}"></div>
       <div class="task-main">
@@ -986,6 +1516,7 @@ function taskCardHTML(task) {
           <div class="task-title">${escHtml(task.title)}</div>
         </div>
         ${task.notes ? `<div class="task-notes">${escHtml(task.notes)}</div>` : ''}
+        ${badgesHtml}
       </div>
       ${!checked ? '<div class="drag-handle" title="Drag to reorder">⠿</div>' : ''}
     </div>`;
@@ -1017,9 +1548,16 @@ function toggleTask(e, id) {
   if (!t) return;
   t.completed = !t.completed;
   t.updatedAt = new Date().toISOString();
+
+  if (t.completed && t.recurring) {
+    t.lastCompletedDate = todayStr();
+    snack('Done for today — resets at next occurrence ↻');
+  } else {
+    snack(t.completed ? '✓ Marked complete' : 'Moved back to active');
+  }
+
   save();
   render();
-  snack(t.completed ? '✓ Marked complete' : 'Moved back to active');
 }
 
 function deleteTask(id) {
@@ -1048,10 +1586,142 @@ function clearDone() {
   snack(`Cleared ${cnt} completed task${cnt !== 1 ? 's' : ''}`);
 }
 
+// ── Modal — Recurring section ─────────────────────────────────────────────────
+function toggleRecurring() {
+  isRecurring = !isRecurring;
+  document.getElementById('recToggleBtn').classList.toggle('on', isRecurring);
+  const sec = document.getElementById('recSection');
+  if (isRecurring) {
+    sec.style.display = 'block';
+    renderRecSection();
+  } else {
+    sec.style.display = 'none';
+  }
+}
+
+function selectRecurrence(r) {
+  selectedRecurrence = r;
+  const curTime = document.getElementById('fAlertTime')?.value || '09:00';
+  renderRecSection(curTime);
+}
+
+function selectDOW(d) {
+  selectedDayOfWeek = d;
+  const curTime = document.getElementById('fAlertTime')?.value || '09:00';
+  renderRecSection(curTime);
+}
+
+function renderRecSection(alertTimeVal) {
+  const timeVal = alertTimeVal || document.getElementById('fAlertTime')?.value || '09:00';
+  const sec = document.getElementById('recSection');
+
+  const patterns = ['daily', 'weekdays', 'weekly', 'monthly'];
+  const patternHtml = patterns.map(p =>
+    `<div class="rec-pattern-opt ${selectedRecurrence === p ? 'active' : ''}" onclick="selectRecurrence('${p}')">${REC_LABELS[p]}</div>`
+  ).join('');
+
+  let subHtml = '';
+  if (selectedRecurrence === 'weekly') {
+    const dowHtml = DOW_SHORT.map((d, i) =>
+      `<div class="dow-opt ${selectedDayOfWeek === i ? 'active' : ''}" onclick="selectDOW(${i})">${d}</div>`
+    ).join('');
+    subHtml = `
+      <div>
+        <div class="rec-sub-label">Day of week</div>
+        <div class="day-of-week-grid">${dowHtml}</div>
+      </div>`;
+  } else if (selectedRecurrence === 'monthly') {
+    subHtml = `
+      <div>
+        <div class="rec-sub-label">Day of month</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="number" min="1" max="31" value="${selectedDayOfMonth}" oninput="selectedDayOfMonth=parseInt(this.value)||1" />
+          <span style="font-size:13px;color:var(--text3)">of each month</span>
+        </div>
+      </div>`;
+  }
+
+  sec.innerHTML = `
+    <div class="rec-section">
+      <div>
+        <div class="rec-sub-label">Repeat</div>
+        <div class="rec-pattern-grid">${patternHtml}</div>
+      </div>
+      ${subHtml}
+      <div>
+        <div class="rec-sub-label">Alert time</div>
+        <div class="time-input-row">
+          <input type="time" id="fAlertTime" value="${timeVal}" />
+          <span class="time-input-hint">alert fires at this time</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Modal — Reminders section ─────────────────────────────────────────────────
+function updateRemindersVisibility() {
+  const dueVal = document.getElementById('fDue').value;
+  document.getElementById('remindersGroup').style.display = dueVal ? 'block' : 'none';
+}
+
+function renderModalReminders() {
+  const container = document.getElementById('reminderPills');
+  if (modalReminders.length === 0) {
+    container.innerHTML = `<div class="no-reminders-hint">No reminders set — tap + Add to create one</div>`;
+    return;
+  }
+  container.innerHTML = modalReminders.map((rem, i) => `
+    <div class="reminder-pill">
+      <div class="reminder-pill-dot" style="background:${REM_COLORS[i % REM_COLORS.length]}"></div>
+      <div class="reminder-pill-label">${escHtml(rem.label)}</div>
+      <button class="reminder-pill-remove" onclick="removeReminder('${rem.id}')" aria-label="Remove">×</button>
+    </div>`).join('');
+}
+
+function showReminderPicker() {
+  reminderPickerVisible = !reminderPickerVisible;
+  document.getElementById('reminderPickerRow').style.display = reminderPickerVisible ? 'flex' : 'none';
+  document.getElementById('addReminderBtn').textContent = reminderPickerVisible ? '− Cancel' : '+ Add';
+}
+
+function confirmAddReminder() {
+  const sel    = document.getElementById('reminderSelect');
+  const amount = parseInt(sel.value);
+  const label  = sel.options[sel.selectedIndex].text;
+  if (modalReminders.find(r => r.amount === amount)) {
+    snack('That reminder is already set');
+    return;
+  }
+  modalReminders.push({ id: uid(), amount, label });
+  modalReminders.sort((a, b) => b.amount - a.amount); // furthest first
+  showReminderPicker(); // hide picker
+  renderModalReminders();
+}
+
+function removeReminder(remId) {
+  modalReminders = modalReminders.filter(r => r.id !== remId);
+  renderModalReminders();
+}
+
 // ── Task Modal ────────────────────────────────────────────────────────────────
 function populateCategorySelect() {
   const sel = document.getElementById('fCategory');
   sel.innerHTML = categories.map(c => `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join('');
+}
+
+function resetModalRecurringState() {
+  isRecurring = false;
+  selectedRecurrence = 'daily';
+  selectedDayOfWeek = new Date().getDay() || 1;
+  selectedDayOfMonth = new Date().getDate();
+  modalReminders = [];
+  reminderPickerVisible = false;
+  document.getElementById('recToggleBtn').classList.remove('on');
+  document.getElementById('recSection').style.display = 'none';
+  document.getElementById('remindersGroup').style.display = 'none';
+  document.getElementById('reminderPickerRow').style.display = 'none';
+  document.getElementById('addReminderBtn').textContent = '+ Add';
+  renderModalReminders();
 }
 
 function openAdd() {
@@ -1066,6 +1736,7 @@ function openAdd() {
   document.getElementById('taskDeleteBtn').style.display = 'none';
   populateCategorySelect();
   highlightUrgency('medium');
+  resetModalRecurringState();
   openModal('taskModal');
   setTimeout(() => document.getElementById('fTitle').focus(), 350);
 }
@@ -1073,27 +1744,46 @@ function openAdd() {
 function openEdit(id) {
   const t = tasks.find(t => t.id === id);
   if (!t) return;
-  editingId = id;
-  selectedUrgency = t.urgency;
+  editingId         = id;
+  selectedUrgency   = t.urgency;
+  isRecurring       = !!t.recurring;
+  selectedRecurrence = t.recurrence || 'daily';
+  selectedDayOfWeek  = t.alertDayOfWeek !== undefined ? t.alertDayOfWeek : (new Date().getDay() || 1);
+  selectedDayOfMonth = t.alertDayOfMonth || new Date().getDate();
+  modalReminders     = t.reminders ? t.reminders.map(r => ({ ...r })) : [];
+  reminderPickerVisible = false;
+
   document.getElementById('modalTitle').textContent = 'Edit Task';
-  document.getElementById('fTitle').value = t.title;
-  document.getElementById('fDue').value = t.dueDate || '';
-  document.getElementById('fNotes').value = t.notes || '';
+  document.getElementById('fTitle').value  = t.title;
+  document.getElementById('fDue').value    = t.dueDate || '';
+  document.getElementById('fNotes').value  = t.notes || '';
   document.getElementById('taskSaveBtn').textContent = 'Save Changes';
   document.getElementById('taskDeleteBtn').style.display = 'flex';
+  document.getElementById('recToggleBtn').classList.toggle('on', isRecurring);
+
+  const recSec = document.getElementById('recSection');
+  if (isRecurring) {
+    recSec.style.display = 'block';
+    renderRecSection(t.alertTime || '09:00');
+  } else {
+    recSec.style.display = 'none';
+  }
+
+  document.getElementById('reminderPickerRow').style.display = 'none';
+  document.getElementById('addReminderBtn').textContent = '+ Add';
+  renderModalReminders();
+  updateRemindersVisibility();
+
   populateCategorySelect();
   document.getElementById('fCategory').value = t.category;
-  if (t.dueDate) {
-    showAutoBadge(t.dueDate);
-  } else {
-    document.getElementById('autoBadge').textContent = '';
-  }
+  if (t.dueDate) showAutoBadge(t.dueDate);
+  else document.getElementById('autoBadge').textContent = '';
   highlightUrgency(t.urgency);
   openModal('taskModal');
 }
 
 function saveTask() {
-  const title = document.getElementById('fTitle').value.trim();
+  const title    = document.getElementById('fTitle').value.trim();
   if (!title) { snack('Please enter a task title'); return; }
 
   const category = document.getElementById('fCategory').value;
@@ -1101,16 +1791,41 @@ function saveTask() {
   const notes    = document.getElementById('fNotes').value.trim();
   const urgency  = selectedUrgency;
 
+  // Recurring fields
+  const recurring        = isRecurring;
+  const recurrence       = recurring ? selectedRecurrence : null;
+  const alertTimeEl      = document.getElementById('fAlertTime');
+  const alertTime        = recurring && alertTimeEl ? alertTimeEl.value : null;
+  const alertDayOfWeek   = recurring && recurrence === 'weekly'  ? selectedDayOfWeek  : null;
+  const alertDayOfMonth  = recurring && recurrence === 'monthly' ? selectedDayOfMonth : null;
+  const reminders        = [...modalReminders];
+
   if (editingId) {
     const t = tasks.find(t => t.id === editingId);
-    Object.assign(t, { title, category, urgency, dueDate, notes, updatedAt: new Date().toISOString() });
+    Object.assign(t, {
+      title, category, urgency, dueDate, notes,
+      recurring, recurrence, alertTime, alertDayOfWeek, alertDayOfMonth,
+      reminders,
+      updatedAt: new Date().toISOString()
+    });
     snack('Task updated');
   } else {
     const activeOrders = tasks.filter(t => !t.completed && t.sortOrder !== undefined).map(t => t.sortOrder);
-    const newOrder = activeOrders.length > 0 ? Math.min(...activeOrders) - 1 : 0;
-    tasks.unshift({ id: uid(), title, category, urgency, dueDate, notes, completed: false, createdAt: new Date().toISOString(), sortOrder: newOrder });
+    const newOrder     = activeOrders.length > 0 ? Math.min(...activeOrders) - 1 : 0;
+    tasks.unshift({
+      id: uid(), title, category, urgency, dueDate, notes,
+      recurring, recurrence, alertTime, alertDayOfWeek, alertDayOfMonth,
+      reminders,
+      completed: false,
+      createdAt: new Date().toISOString(),
+      sortOrder: newOrder,
+      firedDates: {},
+      lastCompletedDate: null
+    });
     snack('Task added');
   }
+
+  if (recurring || reminders.length > 0) requestNotifPermission();
 
   save();
   closeModal('taskModal');
@@ -1134,15 +1849,13 @@ function autoUrgencyFromDate() {
   const dateStr = document.getElementById('fDue').value;
   showAutoBadge(dateStr);
   const auto = urgencyFromDate(dateStr);
-  if (auto) {
-    selectedUrgency = auto;
-    highlightUrgency(auto);
-  }
+  if (auto) { selectedUrgency = auto; highlightUrgency(auto); }
+  updateRemindersVisibility();
 }
 
 function showAutoBadge(dateStr) {
   const badge = document.getElementById('autoBadge');
-  const auto = urgencyFromDate(dateStr);
+  const auto  = urgencyFromDate(dateStr);
   if (auto && dateStr) {
     badge.innerHTML = `Auto-set: <span>${URGENCY_ICON[auto]} ${URGENCY_LABEL[auto]}</span>`;
   } else {
@@ -1171,7 +1884,7 @@ function renderCatChips() {
 
 function addCategory() {
   const input = document.getElementById('newCatInput');
-  const name = input.value.trim();
+  const name  = input.value.trim();
   if (!name) return;
   if (categories.includes(name)) { snack('Category already exists'); return; }
   categories.push(name);
@@ -1196,10 +1909,9 @@ let dragSrcId = null;
 
 function initDnD() {
   document.querySelectorAll('.task-card:not(.done)').forEach(card => {
-    const id = card.id.replace('card-', '');
+    const id     = card.id.replace('card-', '');
     const handle = card.querySelector('.drag-handle');
 
-    // ── Desktop: HTML5 drag API ──
     card.addEventListener('dragstart', e => {
       dragSrcId = id;
       e.dataTransfer.effectAllowed = 'move';
@@ -1233,21 +1945,19 @@ function initDnD() {
       dragSrcId = null;
     });
 
-    // ── Mobile: Touch drag from the handle ──
     if (handle) handle.addEventListener('touchstart', e => onTouchDragStart(e, card, id), { passive: false });
   });
 }
 
-// Touch drag state
 let touchDragId = null, touchDragCard = null, touchGhost = null;
 let touchOffsetX = 0, touchOffsetY = 0;
 
 function onTouchDragStart(e, card, id) {
   e.preventDefault();
-  touchDragId = id;
+  touchDragId   = id;
   touchDragCard = card;
   const touch = e.touches[0];
-  const rect = card.getBoundingClientRect();
+  const rect  = card.getBoundingClientRect();
   touchOffsetX = touch.clientX - rect.left;
   touchOffsetY = touch.clientY - rect.top;
 
@@ -1264,7 +1974,7 @@ function onTouchDragStart(e, card, id) {
   card.style.opacity = '0.25';
 
   document.addEventListener('touchmove', onTouchDragMove, { passive: false });
-  document.addEventListener('touchend', onTouchDragEnd, { passive: false });
+  document.addEventListener('touchend', onTouchDragEnd,   { passive: false });
 }
 
 function onTouchDragMove(e) {
@@ -1301,7 +2011,7 @@ function onTouchDragEnd(e) {
 }
 
 function performDrop(srcId, tgtId) {
-  const allCards = [...document.querySelectorAll('.task-card:not(.done)')];
+  const allCards  = [...document.querySelectorAll('.task-card:not(.done)')];
   const orderedIds = allCards.map(c => c.id.replace('card-', ''));
 
   const srcPos = orderedIds.indexOf(srcId);
@@ -1311,12 +2021,10 @@ function performDrop(srcId, tgtId) {
   orderedIds.splice(srcPos, 1);
   orderedIds.splice(tgtPos, 0, srcId);
 
-  // Assign clean sortOrders based on new visible order
   orderedIds.forEach((id, idx) => {
     const task = tasks.find(t => t.id === id);
     if (task) task.sortOrder = idx;
   });
-  // Tasks not in current view (filtered out) get higher sortOrder values
   let maxOrder = orderedIds.length;
   tasks.filter(t => !t.completed && !orderedIds.includes(t.id)).forEach(t => { t.sortOrder = maxOrder++; });
 
@@ -1355,12 +2063,20 @@ document.getElementById('newCatInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') addCategory();
 });
 
+// ── Service Worker ────────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW registration failed', err));
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 load();
 migrate();
+autoResetRecurring();
 localStorage.setItem('todo_version', VERSION);
 document.getElementById('versionLabel').textContent = `v${VERSION}`;
 render();
+checkScheduler();                        // fire immediately on load
+setInterval(checkScheduler, 60000);     // then every minute
 </script>
 </body>
 </html>
