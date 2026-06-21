@@ -403,10 +403,132 @@
     .tbadge-due.overdue { background: var(--critical-soft); color: var(--critical); }
     .tbadge-due.soon    { background: var(--high-soft); color: var(--high); }
     .tbadge-reminders   { background: #fff4e0; color: #a05000; }
+    .tbadge-goal {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tbadge-goal .goal-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
 
     @media (prefers-color-scheme: dark) {
       .tbadge-time      { background: #1a3d24; color: #81c784; }
       .tbadge-reminders { background: #3d2c08; color: #ffb74d; }
+    }
+
+    /* ── Goal Filter Pills ── */
+    .filter-separator {
+      display: flex;
+      align-items: center;
+      padding: 0 2px;
+      color: var(--border);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .pill .goal-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Goal progress cards in settings ── */
+    .goal-card {
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 8px;
+    }
+    .goal-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .goal-card-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .goal-card-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .goal-card-count {
+      font-size: 12px;
+      color: var(--text3);
+      margin-right: 4px;
+    }
+    .goal-card-remove {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 17px;
+      line-height: 1;
+      padding: 0 2px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .goal-card-remove:active { color: var(--critical); }
+    .goal-progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .goal-progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+    .goal-row { display: flex; gap: 8px; align-items: center; }
+    .goal-row input[type="text"] { flex: 1; }
+    .goal-color-picker {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .goal-color-opt {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2.5px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .goal-color-opt:active { transform: scale(0.9); }
+    .goal-color-opt.selected { border-color: var(--text); }
+
+    /* ── Category Chip Selector (multi-select) ── */
+    .cat-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .cat-sel-chip {
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cat-sel-chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
     }
 
     /* Done section toggle */
@@ -999,8 +1121,13 @@
     </div>
 
     <div class="form-group">
-      <label>Category</label>
-      <select id="fCategory"></select>
+      <label>Categories <span style="font-weight:400;text-transform:none;letter-spacing:0">(select one or more)</span></label>
+      <div class="cat-selector" id="fCategoryChips"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Goal <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <select id="fGoal"></select>
     </div>
 
     <div class="form-group">
@@ -1094,6 +1221,16 @@
     </div>
 
     <div class="settings-section">
+      <h3>Goals</h3>
+      <div class="goal-row">
+        <input type="text" id="newGoalInput" placeholder="New goal name…" maxlength="30" />
+        <button class="btn-sm" onclick="addGoal()">Add</button>
+      </div>
+      <div class="goal-color-picker" id="goalColorPicker"></div>
+      <div id="goalCards" style="margin-top:12px"></div>
+    </div>
+
+    <div class="settings-section">
       <h3>Notifications</h3>
       <button class="btn-sm" style="width:100%;text-align:center" onclick="requestNotifPermission().then(ok => snack(ok ? '✓ Notifications enabled' : 'Notifications blocked — check browser settings'))">Enable Notifications</button>
     </div>
@@ -1115,14 +1252,17 @@
 
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
-const VERSION = '1.4';
+const VERSION = '1.6';
 
 // ── State ────────────────────────────────────────────────────────────────────
 let tasks = [];
 let categories = [];
+let goals = [];
 let activeFilter = 'all';
+let activeGoalFilter = null;
 let editingId = null;
 let selectedUrgency = 'medium';
+let selectedCategories = [];
 let doneCollapsed = false;
 
 // Modal recurring/reminder state
@@ -1137,6 +1277,8 @@ let reminderPickerVisible = false;
 let activeBanners = [];
 
 const DEFAULT_CATS = ['Work', 'Personal', 'Health', 'Finance', 'Other'];
+const GOAL_COLORS  = ['#5b5ef4', '#ff9500', '#34c759', '#ff3b30', '#af52de', '#007aff', '#ff2d55', '#5ac8fa', '#ffcc00', '#8e8e93'];
+let selectedGoalColor = GOAL_COLORS[0];
 const REC_LABELS   = { daily: 'Daily', weekdays: 'Weekdays', weekly: 'Weekly', monthly: 'Monthly' };
 const DOW_SHORT    = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const REM_COLORS   = ['#5b5ef4', '#ff9500', '#ff3b30', '#34c759', '#af52de', '#007aff'];
@@ -1145,15 +1287,18 @@ const REM_COLORS   = ['#5b5ef4', '#ff9500', '#ff3b30', '#34c759', '#af52de', '#0
 function save() {
   localStorage.setItem('todo_tasks', JSON.stringify(tasks));
   localStorage.setItem('todo_cats', JSON.stringify(categories));
+  localStorage.setItem('todo_goals', JSON.stringify(goals));
 }
 
 function load() {
   try {
     tasks = JSON.parse(localStorage.getItem('todo_tasks') || '[]');
     categories = JSON.parse(localStorage.getItem('todo_cats') || 'null') || [...DEFAULT_CATS];
+    goals = JSON.parse(localStorage.getItem('todo_goals') || '[]');
   } catch(e) {
     tasks = [];
     categories = [...DEFAULT_CATS];
+    goals = [];
   }
 }
 
@@ -1188,6 +1333,21 @@ function migrate() {
       if (!t.reminders)   t.reminders   = [];
       if (!t.firedDates)  t.firedDates  = {};
       if (t.recurring === undefined) t.recurring = false;
+    });
+  }
+  // v1.4 → v1.5: add goalId to tasks
+  if (prev < '1.5') {
+    tasks.forEach(t => {
+      if (t.goalId === undefined) t.goalId = null;
+    });
+  }
+  // v1.5 → v1.6: category (string) → categories (array)
+  if (prev < '1.6') {
+    tasks.forEach(t => {
+      if (!t.categories) {
+        t.categories = t.category ? [t.category] : [];
+        delete t.category;
+      }
     });
   }
 
@@ -1416,25 +1576,37 @@ function updateSubtitle() {
 function renderFilterBar() {
   const bar = document.getElementById('filterBar');
   const counts = {};
+  const goalCounts = {};
   tasks.filter(t => !t.completed).forEach(t => {
-    counts[t.category] = (counts[t.category] || 0) + 1;
+    (t.categories || []).forEach(c => { counts[c] = (counts[c] || 0) + 1; });
+    if (t.goalId) goalCounts[t.goalId] = (goalCounts[t.goalId] || 0) + 1;
   });
   const totalActive    = tasks.filter(t => !t.completed).length;
   const recurringCount = tasks.filter(t => !t.completed && t.recurring).length;
 
-  const allActive = activeFilter === 'all';
+  const allActive = activeFilter === 'all' && !activeGoalFilter;
   let html = `<div class="pill ${allActive ? 'active' : ''}" onclick="setFilter('all')">All<span class="pill-count">${totalActive}</span></div>`;
 
   if (recurringCount > 0) {
-    const sel = activeFilter === '__recurring__';
+    const sel = activeFilter === '__recurring__' && !activeGoalFilter;
     html += `<div class="pill ${sel ? 'active' : ''}" onclick="setFilter('__recurring__')">↻ Recurring<span class="pill-count">${recurringCount}</span></div>`;
   }
 
   categories.forEach(cat => {
-    const sel = activeFilter === cat;
+    const sel = activeFilter === cat && !activeGoalFilter;
     const cnt = counts[cat] || 0;
     html += `<div class="pill ${sel ? 'active' : ''}" onclick="setFilter('${escHtml(cat)}')">${escHtml(cat)}<span class="pill-count">${cnt}</span></div>`;
   });
+
+  // Goal filter pills
+  if (goals.length > 0) {
+    html += `<div class="filter-separator">│</div>`;
+    goals.forEach(g => {
+      const sel = activeGoalFilter === g.id;
+      const cnt = goalCounts[g.id] || 0;
+      html += `<div class="pill ${sel ? 'active' : ''}" onclick="setGoalFilter('${g.id}')" style="${sel ? 'background:' + g.color + ';border-color:' + g.color + ';color:#fff' : ''}"><span class="goal-dot" style="background:${g.color}${sel ? ';opacity:0' : ''}"></span>${escHtml(g.name)}<span class="pill-count">${cnt}</span></div>`;
+    });
+  }
 
   bar.innerHTML = html;
 }
@@ -1442,18 +1614,23 @@ function renderFilterBar() {
 function renderList() {
   const area = document.getElementById('listArea');
   let filtered = tasks.filter(t => {
+    // Goal filter (applied on top of category filter)
+    if (activeGoalFilter && t.goalId !== activeGoalFilter) return false;
     if (activeFilter === 'all')          return true;
     if (activeFilter === '__recurring__') return t.recurring;
-    return t.category === activeFilter;
+    return (t.categories || []).includes(activeFilter);
   });
 
   const active = filtered.filter(t => !t.completed)
     .sort((a, b) => {
-      if (a.sortOrder !== undefined && b.sortOrder !== undefined) return a.sortOrder - b.sortOrder;
-      if (a.sortOrder !== undefined) return 1;
-      if (b.sortOrder !== undefined) return -1;
+      // Urgency is the primary sort key
       const uo = URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency];
       if (uo !== 0) return uo;
+      // Within same urgency, use manual sort order if available
+      if (a.sortOrder !== undefined && b.sortOrder !== undefined) return a.sortOrder - b.sortOrder;
+      if (a.sortOrder !== undefined) return -1;
+      if (b.sortOrder !== undefined) return 1;
+      // Then by due date
       if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);
       if (a.dueDate) return -1;
       if (b.dueDate) return 1;
@@ -1504,6 +1681,12 @@ function taskCardHTML(task) {
   if (task.reminders && task.reminders.length > 0 && !checked) {
     badges += `<span class="tbadge tbadge-reminders">🔔 ${task.reminders.length} reminder${task.reminders.length !== 1 ? 's' : ''}</span>`;
   }
+  if (task.goalId) {
+    const goal = goals.find(g => g.id === task.goalId);
+    if (goal) {
+      badges += `<span class="tbadge tbadge-goal"><span class="goal-dot" style="background:${goal.color}"></span>${escHtml(goal.name)}</span>`;
+    }
+  }
   const badgesHtml = badges ? `<div class="task-badges">${badges}</div>` : '';
 
   return `
@@ -1533,6 +1716,12 @@ function escHtml(s) {
 // ── Filters ──────────────────────────────────────────────────────────────────
 function setFilter(cat) {
   activeFilter = cat;
+  activeGoalFilter = null;
+  render();
+}
+
+function setGoalFilter(goalId) {
+  activeGoalFilter = activeGoalFilter === goalId ? null : goalId;
   render();
 }
 
@@ -1704,9 +1893,29 @@ function removeReminder(remId) {
 }
 
 // ── Task Modal ────────────────────────────────────────────────────────────────
-function populateCategorySelect() {
-  const sel = document.getElementById('fCategory');
-  sel.innerHTML = categories.map(c => `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join('');
+function renderCategoryChips() {
+  const container = document.getElementById('fCategoryChips');
+  container.innerHTML = categories.map(c => {
+    const active = selectedCategories.includes(c);
+    return `<div class="cat-sel-chip ${active ? 'active' : ''}" onclick="toggleCategoryChip('${escHtml(c)}')">${escHtml(c)}</div>`;
+  }).join('');
+}
+
+function toggleCategoryChip(cat) {
+  const idx = selectedCategories.indexOf(cat);
+  if (idx === -1) selectedCategories.push(cat);
+  else selectedCategories.splice(idx, 1);
+  renderCategoryChips();
+}
+
+function populateGoalSelect(selectedGoalId) {
+  const sel = document.getElementById('fGoal');
+  let html = `<option value="">No goal</option>`;
+  goals.forEach(g => {
+    const selected = g.id === selectedGoalId ? ' selected' : '';
+    html += `<option value="${g.id}"${selected}>${escHtml(g.name)}</option>`;
+  });
+  sel.innerHTML = html;
 }
 
 function resetModalRecurringState() {
@@ -1734,7 +1943,9 @@ function openAdd() {
   document.getElementById('autoBadge').textContent = '';
   document.getElementById('taskSaveBtn').textContent = 'Save Task';
   document.getElementById('taskDeleteBtn').style.display = 'none';
-  populateCategorySelect();
+  selectedCategories = [];
+  renderCategoryChips();
+  populateGoalSelect(null);
   highlightUrgency('medium');
   resetModalRecurringState();
   openModal('taskModal');
@@ -1774,8 +1985,9 @@ function openEdit(id) {
   renderModalReminders();
   updateRemindersVisibility();
 
-  populateCategorySelect();
-  document.getElementById('fCategory').value = t.category;
+  selectedCategories = [...(t.categories || [])];
+  renderCategoryChips();
+  populateGoalSelect(t.goalId || null);
   if (t.dueDate) showAutoBadge(t.dueDate);
   else document.getElementById('autoBadge').textContent = '';
   highlightUrgency(t.urgency);
@@ -1786,7 +1998,8 @@ function saveTask() {
   const title    = document.getElementById('fTitle').value.trim();
   if (!title) { snack('Please enter a task title'); return; }
 
-  const category = document.getElementById('fCategory').value;
+  const taskCategories = [...selectedCategories];
+  const goalId   = document.getElementById('fGoal').value || null;
   const dueDate  = document.getElementById('fDue').value || null;
   const notes    = document.getElementById('fNotes').value.trim();
   const urgency  = selectedUrgency;
@@ -1803,7 +2016,7 @@ function saveTask() {
   if (editingId) {
     const t = tasks.find(t => t.id === editingId);
     Object.assign(t, {
-      title, category, urgency, dueDate, notes,
+      title, categories: taskCategories, goalId, urgency, dueDate, notes,
       recurring, recurrence, alertTime, alertDayOfWeek, alertDayOfMonth,
       reminders,
       updatedAt: new Date().toISOString()
@@ -1813,7 +2026,7 @@ function saveTask() {
     const activeOrders = tasks.filter(t => !t.completed && t.sortOrder !== undefined).map(t => t.sortOrder);
     const newOrder     = activeOrders.length > 0 ? Math.min(...activeOrders) - 1 : 0;
     tasks.unshift({
-      id: uid(), title, category, urgency, dueDate, notes,
+      id: uid(), title, categories: taskCategories, goalId, urgency, dueDate, notes,
       recurring, recurrence, alertTime, alertDayOfWeek, alertDayOfMonth,
       reminders,
       completed: false,
@@ -1866,6 +2079,8 @@ function showAutoBadge(dateStr) {
 // ── Settings Modal ────────────────────────────────────────────────────────────
 function openSettings() {
   renderCatChips();
+  renderGoalColorPicker();
+  renderGoalCards();
   openModal('settingsModal');
 }
 
@@ -1896,12 +2111,80 @@ function addCategory() {
 }
 
 function removeCategory(name) {
-  const inUse = tasks.some(t => t.category === name);
+  const inUse = tasks.some(t => (t.categories || []).includes(name));
   if (inUse) { snack(`Can't remove — category is in use`); return; }
   categories = categories.filter(c => c !== name);
   save();
   renderCatChips();
   render();
+}
+
+// ── Goal Management ──────────────────────────────────────────────────────────
+function renderGoalColorPicker() {
+  const container = document.getElementById('goalColorPicker');
+  container.innerHTML = GOAL_COLORS.map(c =>
+    `<div class="goal-color-opt ${selectedGoalColor === c ? 'selected' : ''}" style="background:${c}" onclick="selectGoalColor('${c}')"></div>`
+  ).join('');
+}
+
+function selectGoalColor(c) {
+  selectedGoalColor = c;
+  renderGoalColorPicker();
+}
+
+function renderGoalCards() {
+  const container = document.getElementById('goalCards');
+  if (goals.length === 0) {
+    container.innerHTML = `<div style="font-size:13px;color:var(--text3);text-align:center;padding:8px 0">No goals yet</div>`;
+    return;
+  }
+  container.innerHTML = goals.map(g => {
+    const total = tasks.filter(t => t.goalId === g.id).length;
+    const done  = tasks.filter(t => t.goalId === g.id && t.completed).length;
+    const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
+    return `
+      <div class="goal-card">
+        <div class="goal-card-header">
+          <div class="goal-card-dot" style="background:${g.color}"></div>
+          <div class="goal-card-name">${escHtml(g.name)}</div>
+          <span class="goal-card-count">${done}/${total}</span>
+          <button class="goal-card-remove" onclick="removeGoal('${g.id}')" title="Remove">×</button>
+        </div>
+        ${total > 0 ? `<div class="goal-progress-bar"><div class="goal-progress-fill" style="width:${pct}%;background:${g.color}"></div></div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function addGoal() {
+  const input = document.getElementById('newGoalInput');
+  const name  = input.value.trim();
+  if (!name) return;
+  if (goals.some(g => g.name.toLowerCase() === name.toLowerCase())) { snack('Goal already exists'); return; }
+  goals.push({ id: uid(), name, color: selectedGoalColor });
+  // Cycle to next unused color
+  const usedColors = goals.map(g => g.color);
+  const nextColor = GOAL_COLORS.find(c => !usedColors.includes(c));
+  selectedGoalColor = nextColor || GOAL_COLORS[goals.length % GOAL_COLORS.length];
+  save();
+  input.value = '';
+  renderGoalColorPicker();
+  renderGoalCards();
+  render();
+  snack(`Goal "${name}" added`);
+}
+
+function removeGoal(id) {
+  const inUse = tasks.some(t => t.goalId === id);
+  if (inUse) {
+    // Unlink tasks from this goal
+    tasks.forEach(t => { if (t.goalId === id) t.goalId = null; });
+  }
+  goals = goals.filter(g => g.id !== id);
+  if (activeGoalFilter === id) activeGoalFilter = null;
+  save();
+  renderGoalCards();
+  render();
+  snack('Goal removed');
 }
 
 // ── Drag and Drop ─────────────────────────────────────────────────────────────
@@ -2061,6 +2344,9 @@ document.getElementById('fTitle').addEventListener('keydown', e => {
 });
 document.getElementById('newCatInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') addCategory();
+});
+document.getElementById('newGoalInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addGoal();
 });
 
 // ── Service Worker ────────────────────────────────────────────────────────────
