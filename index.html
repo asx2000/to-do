@@ -1252,7 +1252,7 @@
 
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
-const VERSION = '1.6';
+const VERSION = '1.7';
 
 // ── State ────────────────────────────────────────────────────────────────────
 let tasks = [];
@@ -1478,8 +1478,18 @@ async function requestNotifPermission() {
 
 function sendNotification(title, body) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  try { new Notification(title, { body, icon: 'icon.svg', badge: 'icon.svg' }); }
-  catch(e) { console.warn('Notification failed', e); }
+  // Prefer SW-based notifications — they work even when the tab is backgrounded
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.showNotification(title, { body, icon: 'icon.svg', badge: 'icon.svg' });
+    }).catch(() => {
+      try { new Notification(title, { body, icon: 'icon.svg', badge: 'icon.svg' }); }
+      catch(e) { console.warn('Notification failed', e); }
+    });
+  } else {
+    try { new Notification(title, { body, icon: 'icon.svg', badge: 'icon.svg' }); }
+    catch(e) { console.warn('Notification failed', e); }
+  }
 }
 
 // ── In-App Alert Banners ──────────────────────────────────────────────────────
@@ -1525,9 +1535,10 @@ function checkScheduler() {
     if (!task.firedDates) task.firedDates = {};
 
     // 1. Recurring task alert time
+    //    Use >= so we catch up if the tab was backgrounded or the interval drifted
     if (task.recurring && task.alertTime && isRecurringToday(task)) {
       const key = 'alert';
-      if (task.firedDates[key] !== today && hhmm === task.alertTime) {
+      if (task.firedDates[key] !== today && hhmm >= task.alertTime) {
         const sub = `${REC_LABELS[task.recurrence] || 'Recurring'} · ${formatTime12(task.alertTime)}`;
         addBanner(`${task.id}-${key}-${today}`, task.title, sub, 'now');
         sendNotification(task.title, sub);
@@ -1554,6 +1565,7 @@ function checkScheduler() {
   });
 
   if (changed) save();
+  syncNotificationsToSW();
 }
 
 // ── Rendering ────────────────────────────────────────────────────────────────
@@ -2349,9 +2361,63 @@ document.getElementById('newGoalInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') addGoal();
 });
 
+// ── Sync scheduled notifications to the Service Worker ───────────────────────
+function syncNotificationsToSW() {
+  if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+  const today = todayStr();
+  const pending = [];
+  tasks.filter(t => !t.completed).forEach(task => {
+    if (!task.firedDates) task.firedDates = {};
+
+    // Recurring alerts
+    if (task.recurring && task.alertTime && isRecurringToday(task)) {
+      if (task.firedDates['alert'] !== today) {
+        pending.push({
+          id: task.id + '-alert',
+          title: task.title,
+          body: `${REC_LABELS[task.recurrence] || 'Recurring'} · ${formatTime12(task.alertTime)}`,
+          time: task.alertTime,
+          date: today
+        });
+      }
+    }
+
+    // Lead-time reminders
+    if (task.dueDate && task.reminders && task.reminders.length > 0) {
+      task.reminders.forEach(rem => {
+        const fireDate = subtractDays(task.dueDate, rem.amount);
+        const key = 'rem-' + rem.id;
+        if (task.firedDates[key] !== today && fireDate === today) {
+          const daysText = rem.amount === 0 ? 'due today' : `due in ${rem.amount} day${rem.amount !== 1 ? 's' : ''}`;
+          pending.push({
+            id: task.id + '-' + key,
+            title: '⏰ ' + task.title,
+            body: `"${task.title}" is ${daysText}`,
+            time: '09:00',  // default morning for date-based reminders
+            date: today
+          });
+        }
+      });
+    }
+  });
+  navigator.serviceWorker.controller.postMessage({ type: 'SYNC_NOTIFICATIONS', pending });
+}
+
 // ── Service Worker ────────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW registration failed', err));
+  navigator.serviceWorker.register('./sw.js')
+    .then(() => navigator.serviceWorker.ready)
+    .then(() => {
+      syncNotificationsToSW();
+      // Request periodic background sync if available
+      if ('periodicSync' in navigator.serviceWorker.ready) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.periodicSync.register('check-notifications', { minInterval: 60 * 60 * 1000 })
+            .catch(() => {}); // fails silently if permission not granted
+        });
+      }
+    })
+    .catch(err => console.warn('SW registration failed', err));
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -2361,8 +2427,8 @@ autoResetRecurring();
 localStorage.setItem('todo_version', VERSION);
 document.getElementById('versionLabel').textContent = `v${VERSION}`;
 render();
-checkScheduler();                        // fire immediately on load
-setInterval(checkScheduler, 60000);     // then every minute
+checkScheduler();                        // fire immediately on load — catches up on missed alerts
+setInterval(checkScheduler, 30000);     // check every 30s (was 60s — tighter loop reduces missed minutes)
 </script>
 </body>
 </html>
