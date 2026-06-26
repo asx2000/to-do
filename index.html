@@ -418,6 +418,7 @@
     @media (prefers-color-scheme: dark) {
       .tbadge-time      { background: #1a3d24; color: #81c784; }
       .tbadge-reminders { background: #3d2c08; color: #ffb74d; }
+    .project-progress-badge { background: var(--surface2) !important; }
     }
 
     /* ── Goal Filter Pills ── */
@@ -1089,6 +1090,193 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
+
+    /* ── Project Cards ── */
+    .project-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      overflow: hidden;
+      transition: opacity 0.2s;
+    }
+    .project-card.all-done {
+      opacity: var(--done-opacity);
+      border-left-color: var(--border);
+    }
+    .project-header {
+      padding: 13px 14px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .project-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .project-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .project-chevron {
+      font-size: 14px;
+      color: var(--text3);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .project-card.expanded .project-chevron {
+      transform: rotate(90deg);
+    }
+    .project-name {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .project-card.all-done .project-name {
+      text-decoration: line-through;
+      color: var(--text3);
+    }
+    .project-header-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .project-progress-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+    .project-rec-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: var(--surface2);
+      color: var(--text2);
+      white-space: nowrap;
+    }
+    .project-progress-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 10px 0 0 22px;
+    }
+    .project-progress-fill {
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+    .project-steps {
+      padding: 0 14px 14px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .project-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .project-step-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      padding: 0;
+    }
+    .project-step-check.checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .project-step-check.checked::after {
+      content: '';
+      width: 5px;
+      height: 8px;
+      border: 1.5px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+    .project-step-text {
+      font-size: 14px;
+      color: var(--text);
+    }
+    .project-step.done .project-step-text {
+      text-decoration: line-through;
+      color: var(--text3);
+    }
+    .pm-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 8px;
+    }
+    .pm-step-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+    .pm-step-num {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text3);
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+    .pm-step-text {
+      flex: 1;
+      font-size: 14px;
+      color: var(--text);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pm-step-remove {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 2px;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pm-step-remove:active { color: var(--critical); }
+    .pm-step-add-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .pm-step-add-row input { flex: 1; }
+    .pm-no-steps {
+      font-size: 13px;
+      color: var(--text3);
+      text-align: center;
+      padding: 12px 0;
+    }
   </style>
 </head>
 <body>
@@ -1100,6 +1288,7 @@
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="btn-gear" id="gearBtn" title="Settings">⚙️</button>
+      <button class="btn-gear" id="projectBtn" title="New project">📋</button>
       <button class="btn-add" id="addBtn" title="Add task">+</button>
     </div>
   </header>
@@ -1247,12 +1436,51 @@
   </div>
 </div>
 
+
+<!-- Project Modal -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="pmTitle">New Project</h2>
+
+    <div class="form-group">
+      <label>Project Name</label>
+      <input type="text" id="pmName" placeholder="e.g. Weekly review" maxlength="60" />
+    </div>
+
+    <div class="form-group">
+      <label>Steps</label>
+      <div class="pm-steps-list" id="pmStepsList"></div>
+      <div class="pm-step-add-row">
+        <input type="text" id="pmNewStep" placeholder="Add a step…" maxlength="80" />
+        <button class="btn-sm" onclick="addProjectStep()">Add</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Recurrence</label>
+      <div class="rec-pattern-grid" id="pmRecGrid"></div>
+    </div>
+
+    <div id="pmRecSub"></div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" id="pmCancelBtn">Cancel</button>
+      <button class="btn-save" id="pmSaveBtn">Save Project</button>
+    </div>
+
+    <button class="btn-delete-modal" id="pmDeleteBtn" style="display:none" onclick="deleteProjectFromModal()">
+      🗑️ Delete Project
+    </button>
+  </div>
+</div>
+
 <!-- Snackbar -->
 <div class="snack" id="snack"></div>
 
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
-const VERSION = '1.7';
+const VERSION = '1.8';
 
 // ── State ────────────────────────────────────────────────────────────────────
 let tasks = [];
@@ -1273,6 +1501,14 @@ let selectedDayOfMonth = 1;
 let modalReminders = [];
 let reminderPickerVisible = false;
 
+// Projects
+let projects = [];
+let editingProjectId = null;
+let projectModalSteps = [];
+let pmSelectedRecurrence = 'weekly';
+let pmSelectedDayOfWeek = 0;
+let pmSelectedDayOfMonth = 1;
+
 // In-app alert banners
 let activeBanners = [];
 
@@ -1288,6 +1524,7 @@ function save() {
   localStorage.setItem('todo_tasks', JSON.stringify(tasks));
   localStorage.setItem('todo_cats', JSON.stringify(categories));
   localStorage.setItem('todo_goals', JSON.stringify(goals));
+  localStorage.setItem('todo_projects', JSON.stringify(projects));
 }
 
 function load() {
@@ -1295,10 +1532,12 @@ function load() {
     tasks = JSON.parse(localStorage.getItem('todo_tasks') || '[]');
     categories = JSON.parse(localStorage.getItem('todo_cats') || 'null') || [...DEFAULT_CATS];
     goals = JSON.parse(localStorage.getItem('todo_goals') || '[]');
+    projects = JSON.parse(localStorage.getItem('todo_projects') || '[]');
   } catch(e) {
     tasks = [];
     categories = [...DEFAULT_CATS];
     goals = [];
+    projects = [];
   }
 }
 
@@ -1349,6 +1588,11 @@ function migrate() {
         delete t.category;
       }
     });
+  }
+
+  // v1.7 → v1.8: add projects array
+  if (prev < '1.8') {
+    if (!projects) projects = [];
   }
 
   save();
@@ -1579,10 +1823,13 @@ function render() {
 
 function updateSubtitle() {
   const active = tasks.filter(t => !t.completed);
+  const activeProjectCount = projects.filter(p => !isProjectComplete(p)).length;
   const el = document.getElementById('subtitle');
   el.textContent = active.length === 0
     ? 'All done ✓'
-    : `${active.length} task${active.length !== 1 ? 's' : ''} remaining`;
+    : activeProjectCount > 0
+      ? `${active.length} task${active.length !== 1 ? 's' : ''}, ${activeProjectCount} project${activeProjectCount !== 1 ? 's' : ''}`
+      : `${active.length} task${active.length !== 1 ? 's' : ''} remaining`;
 }
 
 function renderFilterBar() {
@@ -1598,6 +1845,12 @@ function renderFilterBar() {
 
   const allActive = activeFilter === 'all' && !activeGoalFilter;
   let html = `<div class="pill ${allActive ? 'active' : ''}" onclick="setFilter('all')">All<span class="pill-count">${totalActive}</span></div>`;
+
+  const projectCount = projects.filter(p => !isProjectComplete(p)).length;
+  if (projectCount > 0 || projects.length > 0) {
+    const selP = activeFilter === '__projects__' && !activeGoalFilter;
+    html += `<div class="pill ${selP ? 'active' : ''}" onclick="setFilter('__projects__')">📋 Projects<span class="pill-count">${projectCount}</span></div>`;
+  }
 
   if (recurringCount > 0) {
     const sel = activeFilter === '__recurring__' && !activeGoalFilter;
@@ -1630,6 +1883,7 @@ function renderList() {
     if (activeGoalFilter && t.goalId !== activeGoalFilter) return false;
     if (activeFilter === 'all')          return true;
     if (activeFilter === '__recurring__') return t.recurring;
+    if (activeFilter === '__projects__') return false; // projects rendered separately
     return (t.categories || []).includes(activeFilter);
   });
 
@@ -1652,12 +1906,26 @@ function renderList() {
   const done = filtered.filter(t => t.completed)
     .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
 
-  if (active.length === 0 && done.length === 0) {
+  const hasProjects = projects.length > 0 && (activeFilter === 'all' || activeFilter === '__projects__');
+  if (active.length === 0 && done.length === 0 && !hasProjects) {
     area.innerHTML = `<div class="empty-state"><div class="emoji">✅</div><p>No tasks here.<br>Tap <strong>+</strong> to add one.</p></div>`;
     return;
   }
 
   let html = '';
+
+  // Render project cards (when showing All or Projects filter)
+  if (activeFilter === 'all' || activeFilter === '__projects__') {
+    const activeProjects = projects.filter(p => !isProjectComplete(p));
+    const doneProjects = projects.filter(p => isProjectComplete(p));
+    if (activeProjects.length > 0 || (activeFilter === '__projects__' && doneProjects.length > 0)) {
+      html += activeProjects.map(p => projectCardHTML(p)).join('');
+      if (doneProjects.length > 0) {
+        html += doneProjects.map(p => projectCardHTML(p)).join('');
+      }
+    }
+  }
+
   if (active.length > 0) {
     html += active.map(t => taskCardHTML(t)).join('');
   }
@@ -2345,10 +2613,293 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   });
 });
 
+
+// ── Projects ─────────────────────────────────────────────────────────────────
+function isProjectComplete(p) {
+  return p.steps.length > 0 && p.steps.every(s => s.completed);
+}
+
+function projectDoneCount(p) {
+  return p.steps.filter(s => s.completed).length;
+}
+
+function shouldResetProject(p) {
+  if (!p.lastCompletedDate) return false;
+  const today = todayStr();
+  if (p.lastCompletedDate >= today) return false;
+  const dow = new Date().getDay();
+  switch (p.recurrence) {
+    case 'daily':    return true;
+    case 'weekdays': return dow >= 1 && dow <= 5;
+    case 'weekly': {
+      const days = Math.floor((new Date(today) - new Date(p.lastCompletedDate)) / 86400000);
+      return days >= 7;
+    }
+    case 'monthly': {
+      const last = new Date(p.lastCompletedDate);
+      const now  = new Date(today);
+      return now.getMonth() !== last.getMonth() || now.getFullYear() !== last.getFullYear();
+    }
+    default: return true;
+  }
+}
+
+function autoResetProjects() {
+  let changed = false;
+  projects.forEach(p => {
+    if (isProjectComplete(p) && shouldResetProject(p)) {
+      p.steps.forEach(s => { s.completed = false; });
+      p.lastCompletedDate = null;
+      changed = true;
+    }
+  });
+  if (changed) save();
+}
+
+function projectRecLabel(p) {
+  const labels = { daily: 'Every day', weekdays: 'Weekdays', weekly: 'Weekly', monthly: 'Monthly' };
+  let label = labels[p.recurrence] || p.recurrence;
+  if (p.recurrence === 'weekly' && p.alertDayOfWeek !== undefined) {
+    label = 'Every ' + DOW_SHORT[p.alertDayOfWeek];
+  }
+  if (p.recurrence === 'monthly' && p.alertDayOfMonth) {
+    const d = p.alertDayOfMonth;
+    const suffix = d === 1 || d === 21 || d === 31 ? 'st' : d === 2 || d === 22 ? 'nd' : d === 3 || d === 23 ? 'rd' : 'th';
+    label = d + suffix + ' of month';
+  }
+  return label;
+}
+
+function projectCardHTML(p) {
+  const done = projectDoneCount(p);
+  const total = p.steps.length;
+  const allDone = isProjectComplete(p);
+  const expanded = !!p.expanded;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  let progressBadgeCls, progressBadgeStyle;
+  if (allDone) {
+    progressBadgeStyle = 'background:var(--accent-soft);color:var(--accent)';
+  } else if (done > 0) {
+    progressBadgeStyle = 'background:#fff8ef;color:#ff9500';
+  } else {
+    progressBadgeStyle = 'background:var(--surface2);color:var(--text3)';
+  }
+
+  let stepsHtml = '';
+  if (expanded && !allDone) {
+    stepsHtml = '<div class="project-steps">' + p.steps.map(s => `
+      <div class="project-step ${s.completed ? 'done' : ''}">
+        <button class="project-step-check ${s.completed ? 'checked' : ''}" onclick="event.stopPropagation();toggleProjectStep('${p.id}','${s.id}')" aria-label="Toggle step"></button>
+        <span class="project-step-text">${escHtml(s.text)}</span>
+      </div>`).join('') + '</div>';
+  }
+
+  const chevron = allDone
+    ? `<div style="width:20px;height:20px;border-radius:50%;background:var(--text3);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l3 3 4-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`
+    : `<div class="project-chevron">▶</div>`;
+
+  const progressBar = expanded && !allDone
+    ? `<div class="project-progress-bar"><div class="project-progress-fill" style="width:${pct}%"></div></div>`
+    : '';
+
+  return `
+    <div class="project-card ${allDone ? 'all-done' : ''} ${expanded && !allDone ? 'expanded' : ''}" id="proj-${p.id}">
+      <div class="project-header" onclick="toggleProjectExpand('${p.id}')">
+        <div class="project-header-row">
+          <div class="project-header-left">
+            ${chevron}
+            <span class="project-name">${escHtml(p.name)}</span>
+          </div>
+          <div class="project-header-badges">
+            <span class="project-rec-badge">↻ ${escHtml(projectRecLabel(p))}</span>
+            <span class="project-progress-badge" style="${progressBadgeCls || ''}${progressBadgeStyle}">${done} of ${total}</span>
+          </div>
+        </div>
+        ${progressBar}
+      </div>
+      ${stepsHtml}
+    </div>`;
+}
+
+function toggleProjectExpand(id) {
+  const p = projects.find(p => p.id === id);
+  if (!p || isProjectComplete(p)) {
+    openEditProject(id);
+    return;
+  }
+  p.expanded = !p.expanded;
+  save();
+  render();
+}
+
+function toggleProjectStep(projectId, stepId) {
+  const p = projects.find(p => p.id === projectId);
+  if (!p) return;
+  const s = p.steps.find(s => s.id === stepId);
+  if (!s) return;
+  s.completed = !s.completed;
+
+  if (isProjectComplete(p)) {
+    p.lastCompletedDate = todayStr();
+    p.expanded = false;
+    snack('Project complete — resets at next occurrence ↻');
+  }
+
+  save();
+  render();
+}
+
+// ── Project Modal ────────────────────────────────────────────────────────────
+function renderPmSteps() {
+  const container = document.getElementById('pmStepsList');
+  if (projectModalSteps.length === 0) {
+    container.innerHTML = '<div class="pm-no-steps">No steps yet — add at least one</div>';
+    return;
+  }
+  container.innerHTML = projectModalSteps.map((s, i) => `
+    <div class="pm-step-row">
+      <span class="pm-step-num">${i + 1}</span>
+      <span class="pm-step-text">${escHtml(s.text)}</span>
+      <button class="pm-step-remove" onclick="removeProjectStep('${s.id}')" aria-label="Remove">×</button>
+    </div>`).join('');
+}
+
+function addProjectStep() {
+  const input = document.getElementById('pmNewStep');
+  const text = input.value.trim();
+  if (!text) return;
+  projectModalSteps.push({ id: uid(), text, completed: false });
+  input.value = '';
+  renderPmSteps();
+  input.focus();
+}
+
+function removeProjectStep(stepId) {
+  projectModalSteps = projectModalSteps.filter(s => s.id !== stepId);
+  renderPmSteps();
+}
+
+function renderPmRecurrence() {
+  const grid = document.getElementById('pmRecGrid');
+  const patterns = ['daily', 'weekdays', 'weekly', 'monthly'];
+  grid.innerHTML = patterns.map(p =>
+    `<div class="rec-pattern-opt ${pmSelectedRecurrence === p ? 'active' : ''}" onclick="selectPmRecurrence('${p}')">${REC_LABELS[p]}</div>`
+  ).join('');
+
+  const sub = document.getElementById('pmRecSub');
+  if (pmSelectedRecurrence === 'weekly') {
+    const dowHtml = DOW_SHORT.map((d, i) =>
+      `<div class="dow-opt ${pmSelectedDayOfWeek === i ? 'active' : ''}" onclick="selectPmDOW(${i})">${d}</div>`
+    ).join('');
+    sub.innerHTML = `<div class="form-group"><div class="rec-sub-label" style="font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--text3);margin-bottom:7px">Day of week</div><div class="day-of-week-grid">${dowHtml}</div></div>`;
+  } else if (pmSelectedRecurrence === 'monthly') {
+    sub.innerHTML = `<div class="form-group"><div class="rec-sub-label" style="font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--text3);margin-bottom:7px">Day of month</div><div style="display:flex;align-items:center;gap:10px"><input type="number" min="1" max="31" value="${pmSelectedDayOfMonth}" oninput="pmSelectedDayOfMonth=parseInt(this.value)||1" /><span style="font-size:13px;color:var(--text3)">of each month</span></div></div>`;
+  } else {
+    sub.innerHTML = '';
+  }
+}
+
+function selectPmRecurrence(r) {
+  pmSelectedRecurrence = r;
+  renderPmRecurrence();
+}
+
+function selectPmDOW(d) {
+  pmSelectedDayOfWeek = d;
+  renderPmRecurrence();
+}
+
+function openAddProject() {
+  editingProjectId = null;
+  projectModalSteps = [];
+  pmSelectedRecurrence = 'weekly';
+  pmSelectedDayOfWeek = 0;
+  pmSelectedDayOfMonth = 1;
+  document.getElementById('pmTitle').textContent = 'New Project';
+  document.getElementById('pmName').value = '';
+  document.getElementById('pmSaveBtn').textContent = 'Save Project';
+  document.getElementById('pmDeleteBtn').style.display = 'none';
+  renderPmSteps();
+  renderPmRecurrence();
+  openModal('projectModal');
+  setTimeout(() => document.getElementById('pmName').focus(), 350);
+}
+
+function openEditProject(id) {
+  const p = projects.find(p => p.id === id);
+  if (!p) return;
+  editingProjectId = id;
+  projectModalSteps = p.steps.map(s => ({ ...s }));
+  pmSelectedRecurrence = p.recurrence || 'weekly';
+  pmSelectedDayOfWeek = p.alertDayOfWeek !== undefined ? p.alertDayOfWeek : 0;
+  pmSelectedDayOfMonth = p.alertDayOfMonth || 1;
+  document.getElementById('pmTitle').textContent = 'Edit Project';
+  document.getElementById('pmName').value = p.name;
+  document.getElementById('pmSaveBtn').textContent = 'Save Changes';
+  document.getElementById('pmDeleteBtn').style.display = 'flex';
+  renderPmSteps();
+  renderPmRecurrence();
+  openModal('projectModal');
+}
+
+function saveProject() {
+  const name = document.getElementById('pmName').value.trim();
+  if (!name) { snack('Please enter a project name'); return; }
+  if (projectModalSteps.length === 0) { snack('Add at least one step'); return; }
+
+  if (editingProjectId) {
+    const p = projects.find(p => p.id === editingProjectId);
+    if (p) {
+      p.name = name;
+      // Preserve completion state for existing steps, add new ones
+      const oldStepIds = new Set(p.steps.map(s => s.id));
+      const newSteps = projectModalSteps.map(ms => {
+        const existing = p.steps.find(s => s.id === ms.id);
+        return existing ? { ...existing, text: ms.text } : { ...ms, completed: false };
+      });
+      p.steps = newSteps;
+      p.recurrence = pmSelectedRecurrence;
+      p.alertDayOfWeek = pmSelectedRecurrence === 'weekly' ? pmSelectedDayOfWeek : null;
+      p.alertDayOfMonth = pmSelectedRecurrence === 'monthly' ? pmSelectedDayOfMonth : null;
+    }
+    snack('Project updated');
+  } else {
+    projects.push({
+      id: uid(),
+      name,
+      steps: projectModalSteps.map(s => ({ ...s, completed: false })),
+      recurrence: pmSelectedRecurrence,
+      alertDayOfWeek: pmSelectedRecurrence === 'weekly' ? pmSelectedDayOfWeek : null,
+      alertDayOfMonth: pmSelectedRecurrence === 'monthly' ? pmSelectedDayOfMonth : null,
+      expanded: false,
+      lastCompletedDate: null,
+      createdAt: new Date().toISOString()
+    });
+    snack('Project created');
+  }
+
+  save();
+  closeModal('projectModal');
+  render();
+}
+
+function deleteProjectFromModal() {
+  if (!editingProjectId) return;
+  projects = projects.filter(p => p.id !== editingProjectId);
+  save();
+  closeModal('projectModal');
+  render();
+  snack('Project deleted');
+}
+
 // ── Events ────────────────────────────────────────────────────────────────────
 document.getElementById('addBtn').addEventListener('click', openAdd);
+document.getElementById('projectBtn').addEventListener('click', openAddProject);
 document.getElementById('gearBtn').addEventListener('click', openSettings);
 document.getElementById('taskSaveBtn').addEventListener('click', saveTask);
+document.getElementById('pmSaveBtn').addEventListener('click', saveProject);
+document.getElementById('pmCancelBtn').addEventListener('click', () => closeModal('projectModal'));
 document.getElementById('taskCancelBtn').addEventListener('click', () => closeModal('taskModal'));
 
 document.getElementById('fTitle').addEventListener('keydown', e => {
@@ -2359,6 +2910,12 @@ document.getElementById('newCatInput').addEventListener('keydown', e => {
 });
 document.getElementById('newGoalInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') addGoal();
+});
+document.getElementById('pmNewStep').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addProjectStep();
+});
+document.getElementById('pmName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('pmNewStep').focus();
 });
 
 // ── Sync scheduled notifications to the Service Worker ───────────────────────
@@ -2424,6 +2981,7 @@ if ('serviceWorker' in navigator) {
 load();
 migrate();
 autoResetRecurring();
+autoResetProjects();
 localStorage.setItem('todo_version', VERSION);
 document.getElementById('versionLabel').textContent = `v${VERSION}`;
 render();
