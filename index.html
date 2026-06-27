@@ -123,24 +123,25 @@
       margin-top: 1px;
     }
 
-    .btn-add {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      font-size: 26px;
-      line-height: 1;
-      cursor: pointer;
+    .btn-add-pill {
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 3px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
       flex-shrink: 0;
       box-shadow: 0 3px 12px rgba(91,94,244,0.35);
       transition: transform 0.1s, box-shadow 0.1s;
+      -webkit-tap-highlight-color: transparent;
     }
-    .btn-add:active { transform: scale(0.93); box-shadow: none; }
+    .btn-add-pill:active { transform: scale(0.93); box-shadow: none; }
 
     /* ── Category Filter ── */
     .filter-bar {
@@ -1288,8 +1289,8 @@
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="btn-gear" id="gearBtn" title="Settings">⚙️</button>
-      <button class="btn-gear" id="projectBtn" title="New project">📋</button>
-      <button class="btn-add" id="addBtn" title="Add task">+</button>
+      <button class="btn-add-pill" id="projectBtn" title="New project">+ Project</button>
+      <button class="btn-add-pill" id="addBtn" title="Add task">+ Task</button>
     </div>
   </header>
 
