@@ -1272,6 +1272,18 @@
       margin-top: 4px;
     }
     .pm-step-add-row input { flex: 1; }
+    .project-edit-btn {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 4px;
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+    }
+    .project-edit-btn:active { color: var(--accent); }
     .pm-no-steps {
       font-size: 13px;
       color: var(--text3);
@@ -2625,6 +2637,7 @@ function projectDoneCount(p) {
 }
 
 function shouldResetProject(p) {
+  if (!p.recurrence || p.recurrence === 'once') return false;
   if (!p.lastCompletedDate) return false;
   const today = todayStr();
   if (p.lastCompletedDate >= today) return false;
@@ -2658,6 +2671,7 @@ function autoResetProjects() {
 }
 
 function projectRecLabel(p) {
+  if (!p.recurrence || p.recurrence === 'once') return 'One-time';
   const labels = { daily: 'Every day', weekdays: 'Weekdays', weekly: 'Weekly', monthly: 'Monthly' };
   let label = labels[p.recurrence] || p.recurrence;
   if (p.recurrence === 'weekly' && p.alertDayOfWeek !== undefined) {
@@ -2713,7 +2727,8 @@ function projectCardHTML(p) {
             <span class="project-name">${escHtml(p.name)}</span>
           </div>
           <div class="project-header-badges">
-            <span class="project-rec-badge">↻ ${escHtml(projectRecLabel(p))}</span>
+            <button class="project-edit-btn" onclick="event.stopPropagation();openEditProject('${p.id}')" title="Edit project">✏️</button>
+            <span class="project-rec-badge">${p.recurrence && p.recurrence !== 'once' ? '↻ ' : ''}${escHtml(projectRecLabel(p))}</span>
             <span class="project-progress-badge" style="${progressBadgeCls || ''}${progressBadgeStyle}">${done} of ${total}</span>
           </div>
         </div>
@@ -2744,7 +2759,7 @@ function toggleProjectStep(projectId, stepId) {
   if (isProjectComplete(p)) {
     p.lastCompletedDate = todayStr();
     p.expanded = false;
-    snack('Project complete — resets at next occurrence ↻');
+    snack(p.recurrence === 'once' || !p.recurrence ? 'Project complete ✓' : 'Project complete — resets at next occurrence ↻');
   }
 
   save();
@@ -2783,9 +2798,10 @@ function removeProjectStep(stepId) {
 
 function renderPmRecurrence() {
   const grid = document.getElementById('pmRecGrid');
-  const patterns = ['daily', 'weekdays', 'weekly', 'monthly'];
+  const patterns = ['once', 'daily', 'weekdays', 'weekly', 'monthly'];
+  const pmLabels = { once: 'Once', ...REC_LABELS };
   grid.innerHTML = patterns.map(p =>
-    `<div class="rec-pattern-opt ${pmSelectedRecurrence === p ? 'active' : ''}" onclick="selectPmRecurrence('${p}')">${REC_LABELS[p]}</div>`
+    `<div class="rec-pattern-opt ${pmSelectedRecurrence === p ? 'active' : ''}" onclick="selectPmRecurrence('${p}')">${pmLabels[p]}</div>`
   ).join('');
 
   const sub = document.getElementById('pmRecSub');
@@ -2814,7 +2830,7 @@ function selectPmDOW(d) {
 function openAddProject() {
   editingProjectId = null;
   projectModalSteps = [];
-  pmSelectedRecurrence = 'weekly';
+  pmSelectedRecurrence = 'once';
   pmSelectedDayOfWeek = 0;
   pmSelectedDayOfMonth = 1;
   document.getElementById('pmTitle').textContent = 'New Project';
