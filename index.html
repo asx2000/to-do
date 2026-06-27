@@ -1092,6 +1092,20 @@
       align-items: center;
       gap: 10px;
     }
+    .project-step.locked {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .project-step-lock {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .project-step-check {
       width: 20px;
       height: 20px;
@@ -1188,6 +1202,85 @@
       flex-shrink: 0;
     }
     .project-edit-btn:active { color: var(--accent); }
+    /* ── Blocked Tasks ── */
+    .task-card.blocked { opacity: var(--done-opacity); }
+    .task-card.blocked .urgency-bar { background: var(--border) !important; }
+    .task-card.blocked .check-btn {
+      pointer-events: none;
+    }
+    .tbadge-blocked {
+      background: var(--surface2);
+      color: var(--text3);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tbadge-blocks {
+      background: var(--high-soft);
+      color: var(--high);
+    }
+    .blocked-by-select {
+      margin-top: 6px;
+    }
+    .blocked-by-pill {
+      display: flex;
+      align-items: center;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .blocked-by-pill-label {
+      flex: 1;
+      font-size: 14px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .blocked-by-pill-remove {
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .blocked-by-pill-remove:active { color: var(--critical); }
+    .blocked-by-hint {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 6px;
+    }
+    .project-step-blocked-badge {
+      font-size: 11px;
+      color: var(--text3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pm-step-blocker {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      padding-left: 30px;
+    }
+    .pm-step-blocker select {
+      flex: 1;
+      font-size: 13px;
+      padding: 8px 30px 8px 10px;
+    }
+    .pm-step-blocker-label {
+      font-size: 11px;
+      color: var(--text3);
+      white-space: nowrap;
+    }
     .pm-no-steps {
       font-size: 13px;
       color: var(--text3);
@@ -1289,6 +1382,11 @@
       </div>
     </div>
 
+    <div class="form-group" id="blockedByGroup">
+      <label>Blocked by <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <div id="blockedByContent"></div>
+    </div>
+
     <div class="form-group">
       <label>Notes (optional)</label>
       <textarea id="fNotes" placeholder="Any extra details…"></textarea>
@@ -1360,6 +1458,13 @@
     </div>
 
     <div class="form-group">
+      <div class="rec-toggle-row">
+        <span class="rec-toggle-label">Steps must be done in order</span>
+        <button class="toggle-switch" id="pmSequentialBtn" onclick="pmSequential=!pmSequential;document.getElementById('pmSequentialBtn').classList.toggle('on',pmSequential)" aria-label="Toggle sequential"></button>
+      </div>
+    </div>
+
+    <div class="form-group">
       <label>Recurrence</label>
       <div class="rec-pattern-grid" id="pmRecGrid"></div>
     </div>
@@ -1421,6 +1526,7 @@ let projectModalSteps = [];
 let pmSelectedRecurrence = 'weekly';
 let pmSelectedDayOfWeek = 0;
 let pmSelectedDayOfMonth = 1;
+let pmSequential = false;
 
 // In-app alert banners
 let activeBanners = [];
@@ -1784,6 +1890,10 @@ function renderList() {
 
   const active = filtered.filter(t => !t.completed)
     .sort((a, b) => {
+      // Blocked tasks sink to bottom
+      const aBlocked = isTaskBlocked(a) ? 1 : 0;
+      const bBlocked = isTaskBlocked(b) ? 1 : 0;
+      if (aBlocked !== bBlocked) return aBlocked - bBlocked;
       // Urgency is the primary sort key
       const uo = URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency];
       if (uo !== 0) return uo;
@@ -1841,6 +1951,8 @@ function taskCardHTML(task) {
   const checked = task.completed;
   const alert   = isOverdueAlert(task);
   const isRec   = task.recurring && !checked;
+  const blocked = !checked && isTaskBlocked(task);
+  const blocksCount = !checked ? countBlockedTasks(task.id) : 0;
 
   // Build badge row
   let badges = '';
@@ -1856,15 +1968,24 @@ function taskCardHTML(task) {
   if (task.reminders && task.reminders.length > 0 && !checked) {
     badges += `<span class="tbadge tbadge-reminders">🔔 ${task.reminders.length} reminder${task.reminders.length !== 1 ? 's' : ''}</span>`;
   }
+  if (blocked) {
+    const blockerTitle = getBlockerTitle(task);
+    badges += `<span class="tbadge tbadge-blocked"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Blocked by: ${escHtml((blockerTitle || '').slice(0, 30))}</span>`;
+  }
+  if (blocksCount > 0) {
+    badges += `<span class="tbadge tbadge-blocks">Blocks ${blocksCount} task${blocksCount !== 1 ? 's' : ''}</span>`;
+  }
   const badgesHtml = badges ? `<div class="task-badges">${badges}</div>` : '';
 
   return `
-    <div class="task-card ${checked ? 'done' : ''} ${alert ? 'alert-pulse' : ''} ${isRec ? 'is-recurring' : ''}" id="card-${task.id}" onclick="openEdit('${task.id}')"${!checked ? ' draggable="true"' : ''}>
+    <div class="task-card ${checked ? 'done' : ''} ${alert ? 'alert-pulse' : ''} ${isRec ? 'is-recurring' : ''} ${blocked ? 'blocked' : ''}" id="card-${task.id}" onclick="openEdit('${task.id}')"${!checked ? ' draggable="true"' : ''}>
       ${alert ? '<div class="alert-dot"></div>' : ''}
       <div class="urgency-bar ${task.urgency}"></div>
       <div class="task-main">
         <div class="task-top">
-          <button class="check-btn ${checked ? 'checked' : ''}" onclick="toggleTask(event,'${task.id}')" aria-label="Toggle"></button>
+          ${blocked
+            ? '<div class="check-btn" style="pointer-events:none"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>'
+            : `<button class="check-btn ${checked ? 'checked' : ''}" onclick="toggleTask(event,'${task.id}')" aria-label="Toggle"></button>`}
           <div class="task-title">${escHtml(task.title)}</div>
         </div>
         ${task.notes ? `<div class="task-notes">${escHtml(task.notes)}</div>` : ''}
@@ -1899,6 +2020,10 @@ function toggleTask(e, id) {
   e.stopPropagation();
   const t = tasks.find(t => t.id === id);
   if (!t) return;
+  if (!t.completed && isTaskBlocked(t)) {
+    snack('This task is blocked — complete the blocker first');
+    return;
+  }
   t.completed = !t.completed;
   t.updatedAt = new Date().toISOString();
 
@@ -1916,6 +2041,8 @@ function toggleTask(e, id) {
 function deleteTask(id) {
   const idx = tasks.findIndex(t => t.id === id);
   if (idx === -1) return;
+  // Unblock any tasks blocked by this one
+  tasks.forEach(t => { if (t.blockedBy === id) t.blockedBy = null; });
   const removed = tasks.splice(idx, 1)[0];
   save();
   render();
@@ -2102,7 +2229,9 @@ function openAdd() {
   selectedCategories = [];
   renderCategoryChips();
   highlightUrgency('medium');
+  selectedBlockedBy = null;
   resetModalRecurringState();
+  renderBlockedByField();
   openModal('taskModal');
   setTimeout(() => document.getElementById('fTitle').focus(), 350);
 }
@@ -2140,11 +2269,13 @@ function openEdit(id) {
   renderModalReminders();
   updateRemindersVisibility();
 
+  selectedBlockedBy = t.blockedBy || null;
   selectedCategories = [...(t.categories || [])];
   renderCategoryChips();
   if (t.dueDate) showAutoBadge(t.dueDate);
   else document.getElementById('autoBadge').textContent = '';
   highlightUrgency(t.urgency);
+  renderBlockedByField();
   openModal('taskModal');
 }
 
@@ -2156,6 +2287,7 @@ function saveTask() {
   const dueDate  = document.getElementById('fDue').value || null;
   const notes    = document.getElementById('fNotes').value.trim();
   const urgency  = selectedUrgency;
+  const blockedBy = selectedBlockedBy || null;
 
   // Recurring fields
   const recurring        = isRecurring;
@@ -2171,7 +2303,7 @@ function saveTask() {
     Object.assign(t, {
       title, categories: taskCategories, urgency, dueDate, notes,
       recurring, recurrence, alertTime, alertDayOfWeek, alertDayOfMonth,
-      reminders,
+      reminders, blockedBy,
       updatedAt: new Date().toISOString()
     });
     snack('Task updated');
@@ -2181,7 +2313,7 @@ function saveTask() {
     tasks.unshift({
       id: uid(), title, categories: taskCategories, urgency, dueDate, notes,
       recurring, recurrence, alertTime, alertDayOfWeek, alertDayOfMonth,
-      reminders,
+      reminders, blockedBy,
       completed: false,
       createdAt: new Date().toISOString(),
       sortOrder: newOrder,
@@ -2418,6 +2550,60 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 });
 
 
+// ── Task Blocking ─────────────────────────────────────────────────────────────
+let selectedBlockedBy = null;
+
+function renderBlockedByField() {
+  const container = document.getElementById('blockedByContent');
+  const otherTasks = tasks.filter(t => !t.completed && t.id !== editingId);
+  
+  if (selectedBlockedBy) {
+    const blocker = tasks.find(t => t.id === selectedBlockedBy);
+    const blockerTitle = blocker ? escHtml(blocker.title) : 'Unknown task';
+    container.innerHTML = `
+      <div class="blocked-by-pill">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;color:var(--text3)"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="blocked-by-pill-label">${blockerTitle}</span>
+        <button class="blocked-by-pill-remove" onclick="clearBlockedBy()" aria-label="Remove">×</button>
+      </div>
+      <div class="blocked-by-hint">This task can't be checked off until the blocker is done</div>`;
+  } else if (otherTasks.length > 0) {
+    container.innerHTML = `
+      <select class="blocked-by-select" id="blockedBySelect" onchange="setBlockedBy(this.value)">
+        <option value="">No blocker</option>
+        ${otherTasks.map(t => `<option value="${t.id}">${escHtml(t.title.slice(0, 50))}</option>`).join('')}
+      </select>`;
+  } else {
+    container.innerHTML = `<div class="blocked-by-hint">No other active tasks to block on</div>`;
+  }
+}
+
+function setBlockedBy(taskId) {
+  selectedBlockedBy = taskId || null;
+  renderBlockedByField();
+}
+
+function clearBlockedBy() {
+  selectedBlockedBy = null;
+  renderBlockedByField();
+}
+
+function isTaskBlocked(task) {
+  if (!task.blockedBy) return false;
+  const blocker = tasks.find(t => t.id === task.blockedBy);
+  return blocker && !blocker.completed;
+}
+
+function getBlockerTitle(task) {
+  if (!task.blockedBy) return null;
+  const blocker = tasks.find(t => t.id === task.blockedBy);
+  return blocker ? blocker.title : null;
+}
+
+function countBlockedTasks(taskId) {
+  return tasks.filter(t => t.blockedBy === taskId && !t.completed).length;
+}
+
 // ── Projects ─────────────────────────────────────────────────────────────────
 function isProjectComplete(p) {
   return p.steps.length > 0 && p.steps.every(s => s.completed);
@@ -2507,11 +2693,33 @@ function projectCardHTML(p) {
 
   let stepsHtml = '';
   if (expanded && !allDone) {
-    stepsHtml = '<div class="project-steps">' + p.steps.map(s => `
-      <div class="project-step ${s.completed ? 'done' : ''}">
-        <button class="project-step-check ${s.completed ? 'checked' : ''}" onclick="event.stopPropagation();toggleProjectStep('${p.id}','${s.id}')" aria-label="Toggle step"></button>
+    let foundNextStep = false;
+    stepsHtml = '<div class="project-steps">' + p.steps.map(s => {
+      if (s.completed) {
+        return `<div class="project-step done">
+          <button class="project-step-check checked" onclick="event.stopPropagation();toggleProjectStep('${p.id}','${s.id}')" aria-label="Toggle step"></button>
+          <span class="project-step-text">${escHtml(s.text)}</span>
+        </div>`;
+      }
+      // Check if blocked by sequential mode or by a specific step
+      const seqLocked = p.sequential && foundNextStep;
+      const stepBlocker = s.blockedBy ? p.steps.find(bs => bs.id === s.blockedBy) : null;
+      const stepBlocked = stepBlocker && !stepBlocker.completed;
+      const isLocked = seqLocked || stepBlocked;
+      if (!foundNextStep) foundNextStep = true;
+      if (isLocked) {
+        const reason = stepBlocked ? escHtml(stepBlocker.text) : '';
+        return `<div class="project-step locked">
+          <div class="project-step-lock"><svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <span class="project-step-text">${escHtml(s.text)}</span>
+          ${stepBlocked ? `<span class="project-step-blocked-badge">← ${reason}</span>` : ''}
+        </div>`;
+      }
+      return `<div class="project-step">
+        <button class="project-step-check" onclick="event.stopPropagation();toggleProjectStep('${p.id}','${s.id}')" aria-label="Toggle step"></button>
         <span class="project-step-text">${escHtml(s.text)}</span>
-      </div>`).join('') + '</div>';
+      </div>`;
+    }).join('') + '</div>';
   }
 
   const chevron = allDone
@@ -2558,6 +2766,14 @@ function toggleProjectStep(projectId, stepId) {
   if (!p) return;
   const s = p.steps.find(s => s.id === stepId);
   if (!s) return;
+  // Check if blocked
+  if (!s.completed && s.blockedBy) {
+    const blocker = p.steps.find(bs => bs.id === s.blockedBy);
+    if (blocker && !blocker.completed) {
+      snack('Complete "' + blocker.text.slice(0,30) + '" first');
+      return;
+    }
+  }
   s.completed = !s.completed;
 
   if (isProjectComplete(p)) {
@@ -2577,12 +2793,26 @@ function renderPmSteps() {
     container.innerHTML = '<div class="pm-no-steps">No steps yet — add at least one</div>';
     return;
   }
-  container.innerHTML = projectModalSteps.map((s, i) => `
-    <div class="pm-step-row">
-      <span class="pm-step-num">${i + 1}</span>
-      <span class="pm-step-text">${escHtml(s.text)}</span>
-      <button class="pm-step-remove" onclick="removeProjectStep('${s.id}')" aria-label="Remove">×</button>
-    </div>`).join('');
+  container.innerHTML = projectModalSteps.map((s, i) => {
+    const otherSteps = projectModalSteps.filter(os => os.id !== s.id);
+    const blockerName = s.blockedBy ? (projectModalSteps.find(os => os.id === s.blockedBy) || {}).text || '' : '';
+    let blockerHtml = '';
+    if (otherSteps.length > 0) {
+      if (s.blockedBy) {
+        blockerHtml = `<div class="pm-step-blocker"><span class="pm-step-blocker-label">Blocked by:</span><select onchange="setStepBlocker('${s.id}',this.value)"><option value="">None</option>${otherSteps.map(os => `<option value="${os.id}"${os.id === s.blockedBy ? ' selected' : ''}>${escHtml(os.text.slice(0,40))}</option>`).join('')}</select></div>`;
+      } else {
+        blockerHtml = `<div class="pm-step-blocker"><span class="pm-step-blocker-label">Blocked by:</span><select onchange="setStepBlocker('${s.id}',this.value)"><option value="">None</option>${otherSteps.map(os => `<option value="${os.id}">${escHtml(os.text.slice(0,40))}</option>`).join('')}</select></div>`;
+      }
+    }
+    return `<div>
+      <div class="pm-step-row">
+        <span class="pm-step-num">${i + 1}</span>
+        <span class="pm-step-text">${escHtml(s.text)}</span>
+        <button class="pm-step-remove" onclick="removeProjectStep('${s.id}')" aria-label="Remove">×</button>
+      </div>
+      ${blockerHtml}
+    </div>`;
+  }).join('');
 }
 
 function addProjectStep() {
@@ -2595,7 +2825,16 @@ function addProjectStep() {
   input.focus();
 }
 
+function setStepBlocker(stepId, blockerStepId) {
+  const step = projectModalSteps.find(s => s.id === stepId);
+  if (step) {
+    step.blockedBy = blockerStepId || null;
+  }
+}
+
 function removeProjectStep(stepId) {
+  // Unblock any steps blocked by the removed step
+  projectModalSteps.forEach(s => { if (s.blockedBy === stepId) s.blockedBy = null; });
   projectModalSteps = projectModalSteps.filter(s => s.id !== stepId);
   renderPmSteps();
 }
@@ -2642,6 +2881,8 @@ function openAddProject() {
   document.getElementById('pmSaveBtn').textContent = 'Save Project';
   document.getElementById('pmDeleteBtn').style.display = 'none';
   document.getElementById('pmExpiry').value = '';
+  pmSequential = false;
+  document.getElementById('pmSequentialBtn').classList.remove('on');
   renderPmSteps();
   renderPmRecurrence();
   openModal('projectModal');
@@ -2661,6 +2902,8 @@ function openEditProject(id) {
   document.getElementById('pmSaveBtn').textContent = 'Save Changes';
   document.getElementById('pmDeleteBtn').style.display = 'flex';
   document.getElementById('pmExpiry').value = p.expiryDays || '';
+  pmSequential = !!p.sequential;
+  document.getElementById('pmSequentialBtn').classList.toggle('on', pmSequential);
   renderPmSteps();
   renderPmRecurrence();
   openModal('projectModal');
@@ -2680,13 +2923,14 @@ function saveProject() {
       const oldStepIds = new Set(p.steps.map(s => s.id));
       const newSteps = projectModalSteps.map(ms => {
         const existing = p.steps.find(s => s.id === ms.id);
-        return existing ? { ...existing, text: ms.text } : { ...ms, completed: false };
+        return existing ? { ...existing, text: ms.text, blockedBy: ms.blockedBy || null } : { ...ms, completed: false, blockedBy: ms.blockedBy || null };
       });
       p.steps = newSteps;
       p.recurrence = pmSelectedRecurrence;
       p.alertDayOfWeek = pmSelectedRecurrence === 'weekly' ? pmSelectedDayOfWeek : null;
       p.alertDayOfMonth = pmSelectedRecurrence === 'monthly' ? pmSelectedDayOfMonth : null;
       p.expiryDays = expiryDays;
+      p.sequential = pmSequential;
     }
     snack('Project updated');
   } else {
@@ -2698,6 +2942,7 @@ function saveProject() {
       alertDayOfWeek: pmSelectedRecurrence === 'weekly' ? pmSelectedDayOfWeek : null,
       alertDayOfMonth: pmSelectedRecurrence === 'monthly' ? pmSelectedDayOfMonth : null,
       expiryDays,
+      sequential: pmSequential,
       expanded: false,
       lastCompletedDate: null,
       createdAt: new Date().toISOString()
