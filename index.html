@@ -1426,6 +1426,12 @@
     </div>
 
     <div class="settings-section">
+      <h3>App</h3>
+      <button class="btn-sm" style="width:100%;text-align:center" onclick="forceUpdate()">Force Update (clear cache)</button>
+      <div style="font-size:12px;color:var(--text3);margin-top:6px;text-align:center">Clears cached files and reloads the latest version</div>
+    </div>
+
+    <div class="settings-section">
       <h3>Completed Tasks</h3>
       <button class="btn-danger" onclick="clearDone()">Clear All Completed</button>
     </div>
@@ -2963,6 +2969,28 @@ function deleteProjectFromModal() {
   closeModal('projectModal');
   render();
   snack('Project deleted');
+}
+
+// ── Force Update ──────────────────────────────────────────────────────────────
+async function forceUpdate() {
+  snack('Clearing cache…');
+  try {
+    // Unregister all service workers
+    if (navigator.serviceWorker) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) await reg.unregister();
+    }
+    // Clear all caches
+    if (window.caches) {
+      const names = await caches.keys();
+      for (const name of names) await caches.delete(name);
+    }
+    // Reload from network
+    setTimeout(() => location.reload(true), 500);
+  } catch(e) {
+    console.error('Force update failed', e);
+    location.reload(true);
+  }
 }
 
 // ── Events ────────────────────────────────────────────────────────────────────
