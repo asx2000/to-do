@@ -1469,12 +1469,21 @@ function addTag() {
 }
 
 function removeTag(name) {
-  const inUse = tasks.some(t => (t.tags || []).includes(name));
-  if (inUse) { snack(`Can't remove — tag is in use`); return; }
+  const affectedCount = tasks.filter(t => (t.tags || []).includes(name)).length;
   tags = tags.filter(t => t !== name);
+  // Strip the removed tag from any tasks that had it — they don't get
+  // deleted or hidden, they just fall back to showing under "All".
+  tasks.forEach(t => {
+    if (t.tags && t.tags.includes(name)) {
+      t.tags = t.tags.filter(tg => tg !== name);
+    }
+  });
   save();
   renderTagList();
   render();
+  snack(affectedCount > 0
+    ? `"${name}" removed — ${affectedCount} task${affectedCount !== 1 ? 's' : ''} moved to All`
+    : `"${name}" removed`);
 }
 
 // ── Force Update ──────────────────────────────────────────────────────────────
