@@ -4,7 +4,10 @@ A simple, fast, urgency-based to-do app — built as a PWA so it installs on any
 
 ## Features
 
-- Urgency levels: Critical, High, Medium, Low
+- Every item is a task; tag tasks with one or more tags to organize and filter them
+- Dependencies: mark a task "blocked by" another — it locks until the blocker is done
+- Urgency levels: Critical, High, Medium, Low (auto-set from due date, or set manually)
+- Due dates with overdue alerts
 - Works offline via Service Worker caching
 - Installable on iOS, Android, and desktop
 - Dark mode support (follows system preference)
@@ -28,3 +31,4 @@ To install as an app, open it in Chrome or Safari and use the browser's "Add to 
 - `manifest.json` — PWA manifest (name, icons, display mode)
 - `sw.js` — Service Worker for offline caching
 - `icon.svg` — app icon
+- `PLAN.md` — the v2.0 simplification plan (single task entity, tags, dependencies)

@@ -6,7 +6,6 @@
 
   <title>To-Do</title>
 
-  
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5b5ef4" />
@@ -124,27 +123,27 @@
       margin-top: 1px;
     }
 
-    .btn-add-pill {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      padding: 8px 14px;
-      border-radius: 20px;
-      border: none;
+    .btn-add {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
       background: var(--accent);
       color: #fff;
-      font-size: 13px;
-      font-weight: 600;
+      border: none;
+      font-size: 26px;
+      line-height: 1;
       cursor: pointer;
-      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
       box-shadow: 0 3px 12px rgba(91,94,244,0.35);
       transition: transform 0.1s, box-shadow 0.1s;
       -webkit-tap-highlight-color: transparent;
     }
-    .btn-add-pill:active { transform: scale(0.93); box-shadow: none; }
+    .btn-add:active { transform: scale(0.93); box-shadow: none; }
 
-    /* ── Category Filter ── */
+    /* ── Tag Filter ── */
     .filter-bar {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -192,63 +191,6 @@
       color: var(--text3);
     }
 
-    /* ── Alert Banners ── */
-    .alert-banners {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 8px 16px 0;
-    }
-    .alert-banner {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      border: 1.5px solid;
-      animation: bannerSlideIn 0.3s ease;
-    }
-    .alert-banner.pre { background: var(--high-soft); border-color: var(--high); }
-    .alert-banner.now { background: var(--critical-soft); border-color: var(--critical); }
-    .alert-banner-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .alert-banner-icon.pre { background: var(--high); }
-    .alert-banner-icon.now { background: var(--critical); }
-    .alert-banner-text { flex: 1; min-width: 0; }
-    .alert-banner-title {
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .alert-banner.pre .alert-banner-title { color: var(--high); }
-    .alert-banner.now .alert-banner-title { color: var(--critical); }
-    .alert-banner-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
-    .alert-banner-dismiss {
-      background: none;
-      border: none;
-      font-size: 22px;
-      line-height: 1;
-      color: var(--text3);
-      cursor: pointer;
-      padding: 0 2px;
-      flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .alert-banner-dismiss:active { color: var(--text2); }
-    @keyframes bannerSlideIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
     /* ── Task List ── */
     .list-area {
       flex: 1;
@@ -291,7 +233,6 @@
     }
     .task-card:active:not(.done) { transform: scale(0.985); }
     .task-card.done { opacity: var(--done-opacity); }
-    .task-card.is-recurring:not(.done) { border-left: 4px solid var(--accent); }
 
     /* ── Overdue / Alert pulsing ── */
     @keyframes alertGlow {
@@ -385,6 +326,23 @@
       line-height: 1.5;
     }
 
+    /* ── Tag chips on the card ── */
+    .task-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+    .tag-chip {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
     /* ── Task Badges ── */
     .task-badges {
       display: flex;
@@ -399,28 +357,28 @@
       border-radius: 8px;
       white-space: nowrap;
     }
-    .tbadge-rec      { background: var(--accent-soft); color: var(--accent); }
-    .tbadge-time     { background: #e6f4ea; color: #1e6b3e; }
     .tbadge-due      { background: var(--surface2); color: var(--text2); }
     .tbadge-due.overdue { background: var(--critical-soft); color: var(--critical); }
     .tbadge-due.soon    { background: var(--high-soft); color: var(--high); }
-    .tbadge-reminders   { background: #fff4e0; color: #a05000; }
-
-    @media (prefers-color-scheme: dark) {
-      .tbadge-time      { background: #1a3d24; color: #81c784; }
-      .tbadge-reminders { background: #3d2c08; color: #ffb74d; }
-    .project-progress-badge { background: var(--surface2) !important; }
+    .tbadge-blocked {
+      background: var(--surface2);
+      color: var(--text3);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tbadge-blocks {
+      background: var(--high-soft);
+      color: var(--high);
     }
 
-
-
-    /* ── Category Chip Selector (multi-select) ── */
-    .cat-selector {
+    /* ── Tag Chip Selector (multi-select, in modal) ── */
+    .tag-selector {
       display: flex;
       flex-wrap: wrap;
       gap: 7px;
     }
-    .cat-sel-chip {
+    .tag-sel-chip {
       padding: 7px 14px;
       border-radius: 20px;
       font-size: 13px;
@@ -432,7 +390,7 @@
       transition: all 0.15s;
       -webkit-tap-highlight-color: transparent;
     }
-    .cat-sel-chip.active {
+    .tag-sel-chip.active {
       background: var(--accent);
       border-color: var(--accent);
       color: #fff;
@@ -515,8 +473,6 @@
 
     input[type="text"],
     input[type="date"],
-    input[type="time"],
-    input[type="number"],
     textarea,
     select {
       width: 100%;
@@ -534,12 +490,9 @@
     }
     input[type="text"]:focus,
     input[type="date"]:focus,
-    input[type="time"]:focus,
-    input[type="number"]:focus,
     textarea:focus,
     select:focus { border-color: var(--accent); }
 
-    input[type="number"] { width: 90px; }
     textarea { resize: none; height: 72px; }
 
     select {
@@ -581,181 +534,31 @@
     }
     .auto-badge span { color: var(--accent); font-weight: 600; }
 
-    /* ── Recurring Task Section ── */
-    .rec-toggle-row {
+    /* ── Blocked Tasks / Dependencies ── */
+    .task-card.blocked { opacity: var(--done-opacity); }
+    .task-card.blocked .urgency-bar { background: var(--border) !important; }
+    .task-card.blocked .check-btn { pointer-events: none; }
+
+    .blocked-by-select { margin-top: 6px; }
+    .blocked-by-pill {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
       background: var(--surface2);
-      border-radius: var(--radius-sm);
       border: 1.5px solid var(--border);
-    }
-    .rec-toggle-label {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text);
-    }
-    .toggle-switch {
-      width: 51px;
-      height: 31px;
-      border-radius: 16px;
-      background: var(--border);
-      position: relative;
-      cursor: pointer;
-      transition: background 0.2s;
-      flex-shrink: 0;
-      border: none;
-    }
-    .toggle-switch.on { background: var(--accent); }
-    .toggle-switch::after {
-      content: '';
-      position: absolute;
-      width: 27px;
-      height: 27px;
-      background: #fff;
-      border-radius: 50%;
-      top: 2px;
-      left: 2px;
-      transition: transform 0.2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-    }
-    .toggle-switch.on::after { transform: translateX(20px); }
-
-    .rec-section {
-      margin-top: 10px;
-      padding: 14px;
-      background: var(--surface2);
       border-radius: var(--radius-sm);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .rec-sub-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: var(--text3);
-      margin-bottom: 7px;
-    }
-
-    .rec-pattern-grid {
-      display: flex;
-      gap: 7px;
-      flex-wrap: wrap;
-    }
-    .rec-pattern-opt {
-      padding: 7px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      color: var(--text2);
-      cursor: pointer;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .rec-pattern-opt.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    .day-of-week-grid {
-      display: flex;
-      gap: 5px;
-    }
-    .dow-opt {
-      flex: 1;
-      padding: 7px 2px;
-      border-radius: var(--radius-sm);
-      font-size: 11px;
-      font-weight: 600;
-      text-align: center;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      color: var(--text2);
-      cursor: pointer;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .dow-opt.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    .time-input-row {
-      display: flex;
-      align-items: center;
+      padding: 10px 12px;
       gap: 10px;
+      margin-top: 6px;
     }
-    .time-input-row input[type="time"] {
-      width: 130px;
-      flex-shrink: 0;
-    }
-    .time-input-hint {
-      font-size: 12px;
-      color: var(--text3);
-    }
-
-    /* ── Reminders Section ── */
-    .reminders-section {
-      padding: 14px;
-      background: var(--surface2);
-      border-radius: var(--radius-sm);
-    }
-    .reminders-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .reminders-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text2);
-    }
-    .btn-add-reminder {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--accent);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 3px 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .reminder-pills {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-    .reminder-pill {
-      display: flex;
-      align-items: center;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 9px 12px;
-      gap: 10px;
-    }
-    .reminder-pill-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .reminder-pill-label {
+    .blocked-by-pill-label {
       flex: 1;
       font-size: 14px;
       color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .reminder-pill-remove {
+    .blocked-by-pill-remove {
       background: none;
       border: none;
       color: var(--text3);
@@ -763,40 +566,15 @@
       line-height: 1;
       cursor: pointer;
       padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .reminder-pill-remove:active { color: var(--critical); }
-    .no-reminders-hint {
-      font-size: 13px;
-      color: var(--text3);
-      text-align: center;
-      padding: 6px 0;
-    }
-    .reminder-picker-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin-top: 10px;
-    }
-    .reminder-picker-row select {
-      flex: 1;
-      font-size: 14px;
-      padding: 10px 32px 10px 12px;
-    }
-    .btn-reminder-confirm {
-      padding: 10px 16px;
-      border-radius: var(--radius-sm);
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      -webkit-tap-highlight-color: transparent;
       flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
     }
-    .btn-reminder-confirm:active { opacity: 0.85; }
+    .blocked-by-pill-remove:active { color: var(--critical); }
+    .blocked-by-hint {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 6px;
+    }
 
     /* ── Modal action rows ── */
     .modal-actions {
@@ -808,7 +586,7 @@
     .modal-divider {
       border: none;
       border-top: 1px solid var(--border);
-      margin: 20px 0 0;
+      margin: 28px 0 0;
     }
 
     .btn-cancel {
@@ -856,11 +634,16 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      margin-top: 12px;
+      margin-top: 16px;
       -webkit-tap-highlight-color: transparent;
-      transition: background 0.15s;
+      transition: background 0.15s, color 0.15s;
     }
     .btn-delete-modal:active { background: var(--critical-soft); }
+    .btn-delete-modal.confirm {
+      background: var(--critical);
+      color: #fff;
+    }
+    .btn-delete-modal.confirm:active { background: var(--critical); opacity: 0.85; }
 
     /* ── Settings modal ── */
     .settings-section { margin-bottom: 24px; }
@@ -944,36 +727,6 @@
     }
     .btn-gear:active { opacity: 0.7; }
 
-    /* ── Drag Handle ── */
-    .drag-handle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 14px 0 6px;
-      color: var(--text3);
-      cursor: grab;
-      font-size: 18px;
-      line-height: 1;
-      flex-shrink: 0;
-      touch-action: none;
-      -webkit-user-select: none;
-      user-select: none;
-      letter-spacing: -1px;
-      opacity: 0.5;
-      transition: opacity 0.15s;
-    }
-    .drag-handle:hover { opacity: 1; }
-    .drag-handle:active { cursor: grabbing; }
-    .task-card.dragging {
-      opacity: 0.3 !important;
-      transform: scale(0.97) !important;
-    }
-    .task-card.drag-over {
-      border-color: var(--accent) !important;
-      box-shadow: 0 0 0 2px var(--accent), var(--shadow) !important;
-      transform: scale(1.01);
-    }
-
     /* ── Snackbar ── */
     .snack {
       position: fixed;
@@ -996,298 +749,6 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
-
-    /* ── Project Cards ── */
-    .project-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      margin-bottom: 10px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--accent);
-      overflow: hidden;
-      transition: opacity 0.2s;
-    }
-    .project-card.all-done {
-      opacity: var(--done-opacity);
-      border-left-color: var(--border);
-    }
-    .project-header {
-      padding: 13px 14px;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .project-header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    .project-header-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
-    .project-chevron {
-      font-size: 14px;
-      color: var(--text3);
-      transition: transform 0.2s;
-      flex-shrink: 0;
-    }
-    .project-card.expanded .project-chevron {
-      transform: rotate(90deg);
-    }
-    .project-name {
-      font-size: 17px;
-      font-weight: 500;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .project-card.all-done .project-name {
-      text-decoration: line-through;
-      color: var(--text3);
-    }
-    .project-header-badges {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-    .project-progress-badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 8px;
-    }
-    .project-rec-badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 8px;
-      background: var(--surface2);
-      color: var(--text2);
-      white-space: nowrap;
-    }
-    .project-progress-bar {
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      margin: 10px 0 0 22px;
-    }
-    .project-progress-fill {
-      height: 3px;
-      background: var(--accent);
-      border-radius: 2px;
-      transition: width 0.3s;
-    }
-    .project-steps {
-      padding: 0 14px 14px 36px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .project-step {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .project-step.locked {
-      opacity: 0.4;
-      pointer-events: none;
-    }
-    .project-step-lock {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .project-step-check {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border);
-      background: transparent;
-      flex-shrink: 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      padding: 0;
-    }
-    .project-step-check.checked {
-      background: var(--accent);
-      border-color: var(--accent);
-    }
-    .project-step-check.checked::after {
-      content: '';
-      width: 5px;
-      height: 8px;
-      border: 1.5px solid #fff;
-      border-top: none;
-      border-left: none;
-      transform: rotate(45deg) translate(-1px, -1px);
-    }
-    .project-step-text {
-      font-size: 14px;
-      color: var(--text);
-    }
-    .project-step.done .project-step-text {
-      text-decoration: line-through;
-      color: var(--text3);
-    }
-    .pm-steps-list {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      margin-top: 8px;
-    }
-    .pm-step-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface2);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-    }
-    .pm-step-num {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text3);
-      flex-shrink: 0;
-      width: 18px;
-      text-align: center;
-    }
-    .pm-step-text {
-      flex: 1;
-      font-size: 14px;
-      color: var(--text);
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .pm-step-remove {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 18px;
-      line-height: 1;
-      padding: 0 2px;
-      flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .pm-step-remove:active { color: var(--critical); }
-    .pm-step-add-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .pm-step-add-row input { flex: 1; }
-    .project-edit-btn {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 18px;
-      line-height: 1;
-      padding: 4px;
-      -webkit-tap-highlight-color: transparent;
-      flex-shrink: 0;
-    }
-    .project-edit-btn:active { color: var(--accent); }
-    /* ── Blocked Tasks ── */
-    .task-card.blocked { opacity: var(--done-opacity); }
-    .task-card.blocked .urgency-bar { background: var(--border) !important; }
-    .task-card.blocked .check-btn {
-      pointer-events: none;
-    }
-    .tbadge-blocked {
-      background: var(--surface2);
-      color: var(--text3);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .tbadge-blocks {
-      background: var(--high-soft);
-      color: var(--high);
-    }
-    .blocked-by-select {
-      margin-top: 6px;
-    }
-    .blocked-by-pill {
-      display: flex;
-      align-items: center;
-      background: var(--surface2);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .blocked-by-pill-label {
-      flex: 1;
-      font-size: 14px;
-      color: var(--text);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .blocked-by-pill-remove {
-      background: none;
-      border: none;
-      color: var(--text3);
-      font-size: 22px;
-      line-height: 1;
-      cursor: pointer;
-      padding: 0;
-      flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .blocked-by-pill-remove:active { color: var(--critical); }
-    .blocked-by-hint {
-      font-size: 12px;
-      color: var(--text3);
-      margin-top: 6px;
-    }
-    .project-step-blocked-badge {
-      font-size: 11px;
-      color: var(--text3);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .pm-step-blocker {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 4px;
-      padding-left: 30px;
-    }
-    .pm-step-blocker select {
-      flex: 1;
-      font-size: 13px;
-      padding: 8px 30px 8px 10px;
-    }
-    .pm-step-blocker-label {
-      font-size: 11px;
-      color: var(--text3);
-      white-space: nowrap;
-    }
-    .pm-no-steps {
-      font-size: 13px;
-      color: var(--text3);
-      text-align: center;
-      padding: 12px 0;
-    }
   </style>
 </head>
 <body>
@@ -1299,13 +760,11 @@
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="btn-gear" id="gearBtn" title="Settings">⚙️</button>
-      <button class="btn-add-pill" id="projectBtn" title="New project">+ Project</button>
-      <button class="btn-add-pill" id="addBtn" title="Add task">+ Task</button>
+      <button class="btn-add" id="addBtn" title="Add task">+</button>
     </div>
   </header>
 
   <div class="filter-bar" id="filterBar"></div>
-  <div class="alert-banners" id="alertBanners"></div>
   <div class="list-area" id="listArea"></div>
 </div>
 
@@ -1321,8 +780,8 @@
     </div>
 
     <div class="form-group">
-      <label>Categories <span style="font-weight:400;text-transform:none;letter-spacing:0">(select one or more)</span></label>
-      <div class="cat-selector" id="fCategoryChips"></div>
+      <label>Tags <span style="font-weight:400;text-transform:none;letter-spacing:0">(select one or more)</span></label>
+      <div class="tag-selector" id="fTagChips"></div>
     </div>
 
     <div class="form-group">
@@ -1349,40 +808,6 @@
       <div class="auto-badge" id="autoBadge"></div>
     </div>
 
-    <!-- Recurring Task -->
-    <div class="form-group">
-      <div class="rec-toggle-row">
-        <span class="rec-toggle-label">Recurring task</span>
-        <button class="toggle-switch" id="recToggleBtn" onclick="toggleRecurring()" aria-label="Toggle recurring"></button>
-      </div>
-      <div id="recSection" style="display:none"></div>
-    </div>
-
-    <!-- Lead-time Reminders — shown when due date is set -->
-    <div class="form-group" id="remindersGroup" style="display:none">
-      <label>Reminders <span style="font-weight:400;text-transform:none;letter-spacing:0">before due date</span></label>
-      <div class="reminders-section">
-        <div class="reminders-header">
-          <span class="reminders-title">Alert me ahead of time</span>
-          <button class="btn-add-reminder" id="addReminderBtn" onclick="showReminderPicker()">+ Add</button>
-        </div>
-        <div id="reminderPills" class="reminder-pills"></div>
-        <div id="reminderPickerRow" class="reminder-picker-row" style="display:none">
-          <select id="reminderSelect">
-            <option value="0">Same day</option>
-            <option value="1">1 day before</option>
-            <option value="2">2 days before</option>
-            <option value="3">3 days before</option>
-            <option value="4">4 days before</option>
-            <option value="5">5 days before</option>
-            <option value="7">1 week before</option>
-            <option value="14">2 weeks before</option>
-          </select>
-          <button class="btn-reminder-confirm" onclick="confirmAddReminder()">Add</button>
-        </div>
-      </div>
-    </div>
-
     <div class="form-group" id="blockedByGroup">
       <label>Blocked by <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
       <div id="blockedByContent"></div>
@@ -1398,7 +823,9 @@
       <button class="btn-save" id="taskSaveBtn">Save Task</button>
     </div>
 
-    <!-- Delete button — only visible when editing -->
+    <!-- Delete sits well below Save, behind a divider, and needs a second tap
+         to confirm — all to make an accidental hit harmless. -->
+    <hr class="modal-divider" id="taskDeleteDivider" style="display:none" />
     <button class="btn-delete-modal" id="taskDeleteBtn" style="display:none" onclick="deleteFromModal()">
       🗑️ Delete Task
     </button>
@@ -1412,17 +839,12 @@
     <h2>Settings</h2>
 
     <div class="settings-section">
-      <h3>Categories</h3>
+      <h3>Tags</h3>
       <div class="cat-row">
-        <input type="text" id="newCatInput" placeholder="New category name…" maxlength="24" />
-        <button class="btn-sm" onclick="addCategory()">Add</button>
+        <input type="text" id="newTagInput" placeholder="New tag name…" maxlength="24" />
+        <button class="btn-sm" onclick="addTag()">Add</button>
       </div>
-      <div class="cat-chips" id="catChips"></div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Notifications</h3>
-      <button class="btn-sm" style="width:100%;text-align:center" onclick="requestNotifPermission().then(ok => snack(ok ? '✓ Notifications enabled' : 'Notifications blocked — check browser settings'))">Enable Notifications</button>
+      <div class="cat-chips" id="tagChips"></div>
     </div>
 
     <div class="settings-section">
@@ -1443,177 +865,139 @@
   </div>
 </div>
 
-
-<!-- Project Modal -->
-<div class="modal-overlay" id="projectModal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <h2 id="pmTitle">New Project</h2>
-
-    <div class="form-group">
-      <label>Project Name</label>
-      <input type="text" id="pmName" placeholder="e.g. Weekly review" maxlength="60" />
-    </div>
-
-    <div class="form-group">
-      <label>Steps</label>
-      <div class="pm-steps-list" id="pmStepsList"></div>
-      <div class="pm-step-add-row">
-        <input type="text" id="pmNewStep" placeholder="Add a step…" maxlength="80" />
-        <button class="btn-sm" onclick="addProjectStep()">Add</button>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <div class="rec-toggle-row">
-        <span class="rec-toggle-label">Steps must be done in order</span>
-        <button class="toggle-switch" id="pmSequentialBtn" onclick="pmSequential=!pmSequential;document.getElementById('pmSequentialBtn').classList.toggle('on',pmSequential)" aria-label="Toggle sequential"></button>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Recurrence</label>
-      <div class="rec-pattern-grid" id="pmRecGrid"></div>
-    </div>
-
-    <div id="pmRecSub"></div>
-
-    <div class="form-group">
-      <label>Expires after <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-      <select id="pmExpiry">
-        <option value="">No expiry</option>
-        <option value="1">1 day</option>
-        <option value="3">3 days</option>
-        <option value="5">5 days</option>
-        <option value="7">1 week</option>
-        <option value="14">2 weeks</option>
-        <option value="30">1 month</option>
-      </select>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" id="pmCancelBtn">Cancel</button>
-      <button class="btn-save" id="pmSaveBtn">Save Project</button>
-    </div>
-
-    <button class="btn-delete-modal" id="pmDeleteBtn" style="display:none" onclick="deleteProjectFromModal()">
-      🗑️ Delete Project
-    </button>
-  </div>
-</div>
-
 <!-- Snackbar -->
 <div class="snack" id="snack"></div>
 
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
-const VERSION = '1.8';
+const VERSION = '2.0';
 
 // ── State ────────────────────────────────────────────────────────────────────
 let tasks = [];
-let categories = [];
+let tags = [];
 let activeFilter = 'all';
 let editingId = null;
 let selectedUrgency = 'medium';
-let selectedCategories = [];
+let selectedTags = [];
 let doneCollapsed = false;
+let selectedBlockedBy = null;
+let deleteConfirmPending = false;
+let deleteConfirmTimer = null;
 
-// Modal recurring/reminder state
-let isRecurring = false;
-let selectedRecurrence = 'daily';
-let selectedDayOfWeek = 1;
-let selectedDayOfMonth = 1;
-let modalReminders = [];
-let reminderPickerVisible = false;
-
-// Projects
-let projects = [];
-let editingProjectId = null;
-let projectModalSteps = [];
-let pmSelectedRecurrence = 'weekly';
-let pmSelectedDayOfWeek = 0;
-let pmSelectedDayOfMonth = 1;
-let pmSequential = false;
-
-// In-app alert banners
-let activeBanners = [];
-
-const DEFAULT_CATS = ['Work', 'Personal', 'Health', 'Finance', 'Other'];
-const REC_LABELS   = { daily: 'Daily', weekdays: 'Weekdays', weekly: 'Weekly', monthly: 'Monthly' };
-const DOW_SHORT    = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const REM_COLORS   = ['#5b5ef4', '#ff9500', '#ff3b30', '#34c759', '#af52de', '#007aff'];
+const DEFAULT_TAGS = ['Work', 'Personal', 'Health', 'Finance', 'Other'];
 
 // ── Persistence ──────────────────────────────────────────────────────────────
 function save() {
   localStorage.setItem('todo_tasks', JSON.stringify(tasks));
-  localStorage.setItem('todo_cats', JSON.stringify(categories));
-  localStorage.setItem('todo_projects', JSON.stringify(projects));
+  localStorage.setItem('todo_tags', JSON.stringify(tags));
 }
 
 function load() {
   try {
     tasks = JSON.parse(localStorage.getItem('todo_tasks') || '[]');
-    categories = JSON.parse(localStorage.getItem('todo_cats') || 'null') || [...DEFAULT_CATS];
-    projects = JSON.parse(localStorage.getItem('todo_projects') || '[]');
+    const storedTags = localStorage.getItem('todo_tags');
+    if (storedTags) {
+      tags = JSON.parse(storedTags);
+    } else {
+      const legacyCats = JSON.parse(localStorage.getItem('todo_cats') || 'null');
+      tags = legacyCats || [...DEFAULT_TAGS];
+    }
   } catch(e) {
     tasks = [];
-    categories = [...DEFAULT_CATS];
-    projects = [];
+    tags = [...DEFAULT_TAGS];
   }
 }
 
 // ── Migration ─────────────────────────────────────────────────────────────────
+// v2.0 collapses the old two-entity model (Tasks + Projects, each with their
+// own recurrence/reminder logic) into a single Task entity: every item is a
+// task, every task can carry multiple tags, and dependency chains ("blocked
+// by") do the job Projects used to do. This runs once per browser and is
+// non-destructive — nothing is silently deleted.
 function migrate() {
   const prev = localStorage.getItem('todo_version') || '1.0';
   if (prev === VERSION) return;
 
-  // v1.0 → v1.1: ensure every task has a createdAt field
-  if (prev < '1.1') {
-    tasks.forEach(t => { if (!t.createdAt) t.createdAt = new Date().toISOString(); });
-  }
-  // v1.1 → v1.2: ensure every task has an urgency field
-  if (prev < '1.2') {
-    tasks.forEach(t => { if (!t.urgency) t.urgency = 'medium'; });
-  }
-  // v1.2 → v1.3: assign sortOrder to active tasks
-  if (prev < '1.3') {
-    const activeTasks = tasks.filter(t => !t.completed).sort((a, b) => {
-      const uo = URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency];
-      if (uo !== 0) return uo;
-      if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);
-      if (a.dueDate) return -1;
-      if (b.dueDate) return 1;
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-    activeTasks.forEach((t, i) => { t.sortOrder = i; });
-  }
-  // v1.3 → v1.4: add recurring/reminder fields
-  if (prev < '1.4') {
+  if (prev < '2.0') {
+    // Normalize every task to the new shape: id, title, tags[], urgency,
+    // dueDate, notes, blockedBy, completed, createdAt, updatedAt.
     tasks.forEach(t => {
-      if (!t.reminders)   t.reminders   = [];
-      if (!t.firedDates)  t.firedDates  = {};
-      if (t.recurring === undefined) t.recurring = false;
-    });
-  }
-  // v1.4 → v1.5: add goalId to tasks
-  if (prev < '1.5') {
-    tasks.forEach(t => {
-      if (t.goalId === undefined) t.goalId = null;
-    });
-  }
-  // v1.5 → v1.6: category (string) → categories (array)
-  if (prev < '1.6') {
-    tasks.forEach(t => {
-      if (!t.categories) {
-        t.categories = t.category ? [t.category] : [];
-        delete t.category;
+      if (!t.createdAt) t.createdAt = new Date().toISOString();
+      if (!t.urgency) t.urgency = 'medium';
+      if (!t.tags) {
+        if (Array.isArray(t.categories)) t.tags = t.categories;
+        else if (t.category) t.tags = [t.category];
+        else t.tags = [];
       }
+      delete t.categories;
+      delete t.category;
+      delete t.recurring;
+      delete t.recurrence;
+      delete t.alertTime;
+      delete t.alertDayOfWeek;
+      delete t.alertDayOfMonth;
+      delete t.reminders;
+      delete t.firedDates;
+      delete t.lastCompletedDate;
+      delete t.goalId;
+      delete t.sortOrder;
     });
-  }
 
-  // v1.7 → v1.8: add projects array
-  if (prev < '1.8') {
-    if (!projects) projects = [];
+    // Pick up the tag list, preferring anything already loaded.
+    if (!tags || tags.length === 0) {
+      const legacyCats = JSON.parse(localStorage.getItem('todo_cats') || 'null');
+      tags = legacyCats || [...DEFAULT_TAGS];
+    }
+
+    // Convert any legacy Projects (name + ordered steps) into chained tasks —
+    // each step becomes a task tagged with the project name, linked to the
+    // previous step via "blocked by" when the project was sequential, or
+    // carrying over its own per-step blocker otherwise. Nothing is dropped.
+    let legacyProjects = [];
+    try { legacyProjects = JSON.parse(localStorage.getItem('todo_projects') || '[]'); } catch(e) {}
+
+    if (legacyProjects.length > 0) {
+      let convertedCount = 0;
+      legacyProjects.forEach(p => {
+        if (p.name && !tags.includes(p.name)) tags.push(p.name);
+        const idMap = {};
+        const newTasks = (p.steps || []).map(step => {
+          const newId = uid();
+          idMap[step.id] = newId;
+          return {
+            id: newId,
+            title: step.text,
+            tags: p.name ? [p.name] : [],
+            urgency: 'medium',
+            dueDate: null,
+            notes: '',
+            blockedBy: null,
+            _oldBlockedBy: step.blockedBy || null,
+            completed: !!step.completed,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+        });
+        newTasks.forEach((nt, i) => {
+          if (p.sequential && i > 0) {
+            nt.blockedBy = newTasks[i - 1].id;
+          } else if (nt._oldBlockedBy && idMap[nt._oldBlockedBy]) {
+            nt.blockedBy = idMap[nt._oldBlockedBy];
+          }
+          delete nt._oldBlockedBy;
+        });
+        tasks.push(...newTasks);
+        convertedCount += newTasks.length;
+      });
+      localStorage.removeItem('todo_projects');
+      if (convertedCount > 0) {
+        const projectWord = legacyProjects.length !== 1 ? 'projects' : 'project';
+        const taskWord = convertedCount !== 1 ? 'tasks' : 'task';
+        setTimeout(() => snack(`Converted ${legacyProjects.length} ${projectWord} to ${convertedCount} ${taskWord}`), 700);
+      }
+    }
+
+    localStorage.removeItem('todo_cats');
   }
 
   save();
@@ -1624,24 +1008,6 @@ function migrate() {
 // ── Utilities ────────────────────────────────────────────────────────────────
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function subtractDays(dateStr, n) {
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setDate(d.getDate() - n);
-  return d.toISOString().slice(0, 10);
-}
-
-function formatTime12(timeStr) {
-  if (!timeStr) return '';
-  const [h, m] = timeStr.split(':').map(Number);
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
 function daysUntil(dateStr) {
@@ -1686,229 +1052,59 @@ function snack(msg, ms = 2200) {
   setTimeout(() => el.classList.remove('show'), ms);
 }
 
-// ── Recurring Logic ───────────────────────────────────────────────────────────
-function isRecurringToday(task) {
-  const dow = new Date().getDay(); // 0=Sun
-  const dom = new Date().getDate();
-  switch (task.recurrence) {
-    case 'daily':    return true;
-    case 'weekdays': return dow >= 1 && dow <= 5;
-    case 'weekly':   return dow === (task.alertDayOfWeek !== undefined ? task.alertDayOfWeek : dow);
-    case 'monthly':  return dom === (task.alertDayOfMonth || dom);
-    default:         return false;
-  }
-}
-
-function shouldResetRecurring(task) {
-  if (!task.recurring || !task.lastCompletedDate) return false;
-  const today = todayStr();
-  if (task.lastCompletedDate >= today) return false;
-  const dow = new Date().getDay();
-  switch (task.recurrence) {
-    case 'daily':    return true;
-    case 'weekdays': return dow >= 1 && dow <= 5;
-    case 'weekly': {
-      const days = Math.floor((new Date(today) - new Date(task.lastCompletedDate)) / 86400000);
-      return days >= 7;
-    }
-    case 'monthly': {
-      const last = new Date(task.lastCompletedDate);
-      const now  = new Date(today);
-      return now.getMonth() !== last.getMonth() || now.getFullYear() !== last.getFullYear();
-    }
-    default: return true;
-  }
-}
-
-function autoResetRecurring() {
-  let changed = false;
-  tasks.forEach(t => {
-    if (t.recurring && t.completed && shouldResetRecurring(t)) {
-      t.completed = false;
-      t.lastCompletedDate = null;
-      changed = true;
-    }
-  });
-  if (changed) save();
-}
-
-// ── Notifications ─────────────────────────────────────────────────────────────
-async function requestNotifPermission() {
-  if (!('Notification' in window)) return false;
-  if (Notification.permission === 'granted') return true;
-  if (Notification.permission === 'denied') return false;
-  const result = await Notification.requestPermission();
-  return result === 'granted';
-}
-
-function sendNotification(title, body) {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  // Prefer SW-based notifications — they work even when the tab is backgrounded
-  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.ready.then(reg => {
-      reg.showNotification(title, { body, icon: 'icon.svg', badge: 'icon.svg' });
-    }).catch(() => {
-      try { new Notification(title, { body, icon: 'icon.svg', badge: 'icon.svg' }); }
-      catch(e) { console.warn('Notification failed', e); }
-    });
-  } else {
-    try { new Notification(title, { body, icon: 'icon.svg', badge: 'icon.svg' }); }
-    catch(e) { console.warn('Notification failed', e); }
-  }
-}
-
-// ── In-App Alert Banners ──────────────────────────────────────────────────────
-function addBanner(id, title, sub, type) {
-  if (activeBanners.find(b => b.id === id)) return;
-  activeBanners.push({ id, title, sub, type });
-  renderBanners();
-}
-
-function dismissBanner(id) {
-  activeBanners = activeBanners.filter(b => b.id !== id);
-  renderBanners();
-}
-
-function renderBanners() {
-  const area = document.getElementById('alertBanners');
-  if (!area) return;
-  if (activeBanners.length === 0) { area.innerHTML = ''; return; }
-  area.innerHTML = activeBanners.map(b => `
-    <div class="alert-banner ${b.type}">
-      <div class="alert-banner-icon ${b.type}">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-          <path d="M8 4v4l2.5 2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="8" cy="8" r="6" stroke="#fff" stroke-width="1.5"/>
-        </svg>
-      </div>
-      <div class="alert-banner-text">
-        <div class="alert-banner-title">${escHtml(b.title)}</div>
-        <div class="alert-banner-sub">${escHtml(b.sub)}</div>
-      </div>
-      <button class="alert-banner-dismiss" onclick="dismissBanner('${b.id}')" aria-label="Dismiss">×</button>
-    </div>`).join('');
-}
-
-// ── Scheduler ────────────────────────────────────────────────────────────────
-function checkScheduler() {
-  const now   = new Date();
-  const today = todayStr();
-  const hhmm  = now.toTimeString().slice(0, 5); // 'HH:MM'
-  let changed = false;
-
-  tasks.filter(t => !t.completed).forEach(task => {
-    if (!task.firedDates) task.firedDates = {};
-
-    // 1. Recurring task alert time
-    //    Use >= so we catch up if the tab was backgrounded or the interval drifted
-    if (task.recurring && task.alertTime && isRecurringToday(task)) {
-      const key = 'alert';
-      if (task.firedDates[key] !== today && hhmm >= task.alertTime) {
-        const sub = `${REC_LABELS[task.recurrence] || 'Recurring'} · ${formatTime12(task.alertTime)}`;
-        addBanner(`${task.id}-${key}-${today}`, task.title, sub, 'now');
-        sendNotification(task.title, sub);
-        task.firedDates[key] = today;
-        changed = true;
-      }
-    }
-
-    // 2. Lead-time reminders (N days before due date)
-    if (task.dueDate && task.reminders && task.reminders.length > 0) {
-      task.reminders.forEach(rem => {
-        const fireDate = subtractDays(task.dueDate, rem.amount);
-        const key = 'rem-' + rem.id;
-        if (task.firedDates[key] !== today && fireDate === today) {
-          const daysText = rem.amount === 0 ? 'due today' : `due in ${rem.amount} day${rem.amount !== 1 ? 's' : ''}`;
-          const sub = `"${task.title}" is ${daysText}`;
-          addBanner(`${task.id}-${key}-${today}`, '⏰ ' + task.title, sub, 'pre');
-          sendNotification('Reminder: ' + task.title, sub);
-          task.firedDates[key] = today;
-          changed = true;
-        }
-      });
-    }
-  });
-
-  if (changed) save();
-  syncNotificationsToSW();
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 // ── Rendering ────────────────────────────────────────────────────────────────
 function render() {
   renderFilterBar();
   renderList();
-  renderBanners();
   updateSubtitle();
-  initDnD();
 }
 
 function updateSubtitle() {
   const active = tasks.filter(t => !t.completed);
-  const activeProjectCount = projects.filter(p => !isProjectComplete(p) && !isProjectExpired(p)).length;
   const el = document.getElementById('subtitle');
-  el.textContent = active.length === 0
-    ? 'All done ✓'
-    : activeProjectCount > 0
-      ? `${active.length} task${active.length !== 1 ? 's' : ''}, ${activeProjectCount} project${activeProjectCount !== 1 ? 's' : ''}`
-      : `${active.length} task${active.length !== 1 ? 's' : ''} remaining`;
+  el.textContent = active.length === 0 ? 'All done ✓' : `${active.length} task${active.length !== 1 ? 's' : ''} remaining`;
 }
 
 function renderFilterBar() {
   const bar = document.getElementById('filterBar');
   const counts = {};
   tasks.filter(t => !t.completed).forEach(t => {
-    (t.categories || []).forEach(c => { counts[c] = (counts[c] || 0) + 1; });
+    (t.tags || []).forEach(tag => { counts[tag] = (counts[tag] || 0) + 1; });
   });
-  const totalActive    = tasks.filter(t => !t.completed).length;
-  const recurringCount = tasks.filter(t => !t.completed && t.recurring).length;
+  const totalActive = tasks.filter(t => !t.completed).length;
 
   const allActive = activeFilter === 'all';
   let html = `<div class="pill ${allActive ? 'active' : ''}" onclick="setFilter('all')">All<span class="pill-count">${totalActive}</span></div>`;
 
-  const projectCount = projects.filter(p => !isProjectComplete(p) && !isProjectExpired(p)).length;
-  if (projectCount > 0 || projects.length > 0) {
-    const selP = activeFilter === '__projects__';
-    html += `<div class="pill ${selP ? 'active' : ''}" onclick="setFilter('__projects__')">📋 Projects<span class="pill-count">${projectCount}</span></div>`;
-  }
-
-  if (recurringCount > 0) {
-    const sel = activeFilter === '__recurring__';
-    html += `<div class="pill ${sel ? 'active' : ''}" onclick="setFilter('__recurring__')">↻ Recurring<span class="pill-count">${recurringCount}</span></div>`;
-  }
-
-  categories.forEach(cat => {
-    const sel = activeFilter === cat;
-    const cnt = counts[cat] || 0;
-    html += `<div class="pill ${sel ? 'active' : ''}" onclick="setFilter('${escHtml(cat)}')">${escHtml(cat)}<span class="pill-count">${cnt}</span></div>`;
+  tags.forEach(tag => {
+    const sel = activeFilter === tag;
+    const cnt = counts[tag] || 0;
+    html += `<div class="pill ${sel ? 'active' : ''}" onclick="setFilter('${escHtml(tag)}')">${escHtml(tag)}<span class="pill-count">${cnt}</span></div>`;
   });
-
 
   bar.innerHTML = html;
 }
 
 function renderList() {
   const area = document.getElementById('listArea');
-  let filtered = tasks.filter(t => {
-    if (activeFilter === 'all')          return true;
-    if (activeFilter === '__recurring__') return t.recurring;
-    if (activeFilter === '__projects__') return false; // projects rendered separately
-    return (t.categories || []).includes(activeFilter);
-  });
+  let filtered = tasks.filter(t => activeFilter === 'all' || (t.tags || []).includes(activeFilter));
 
   const active = filtered.filter(t => !t.completed)
     .sort((a, b) => {
-      // Blocked tasks sink to bottom
+      // Blocked tasks sink to the bottom
       const aBlocked = isTaskBlocked(a) ? 1 : 0;
       const bBlocked = isTaskBlocked(b) ? 1 : 0;
       if (aBlocked !== bBlocked) return aBlocked - bBlocked;
-      // Urgency is the primary sort key
       const uo = URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency];
       if (uo !== 0) return uo;
-      // Within same urgency, use manual sort order if available
-      if (a.sortOrder !== undefined && b.sortOrder !== undefined) return a.sortOrder - b.sortOrder;
-      if (a.sortOrder !== undefined) return -1;
-      if (b.sortOrder !== undefined) return 1;
-      // Then by due date
       if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);
       if (a.dueDate) return -1;
       if (b.dueDate) return 1;
@@ -1918,26 +1114,12 @@ function renderList() {
   const done = filtered.filter(t => t.completed)
     .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
 
-  const hasProjects = projects.length > 0 && (activeFilter === 'all' || activeFilter === '__projects__');
-  if (active.length === 0 && done.length === 0 && !hasProjects) {
+  if (active.length === 0 && done.length === 0) {
     area.innerHTML = `<div class="empty-state"><div class="emoji">✅</div><p>No tasks here.<br>Tap <strong>+</strong> to add one.</p></div>`;
     return;
   }
 
   let html = '';
-
-  // Render project cards (when showing All or Projects filter)
-  if (activeFilter === 'all' || activeFilter === '__projects__') {
-    const activeProjects = projects.filter(p => !isProjectComplete(p) && !isProjectExpired(p));
-    const doneProjects = projects.filter(p => isProjectComplete(p) || isProjectExpired(p));
-    if (activeProjects.length > 0 || (activeFilter === '__projects__' && doneProjects.length > 0)) {
-      html += activeProjects.map(p => projectCardHTML(p)).join('');
-      if (doneProjects.length > 0) {
-        html += doneProjects.map(p => projectCardHTML(p)).join('');
-      }
-    }
-  }
-
   if (active.length > 0) {
     html += active.map(t => taskCardHTML(t)).join('');
   }
@@ -1957,23 +1139,16 @@ function taskCardHTML(task) {
   const due     = dueLabel(task.dueDate);
   const checked = task.completed;
   const alert   = isOverdueAlert(task);
-  const isRec   = task.recurring && !checked;
   const blocked = !checked && isTaskBlocked(task);
   const blocksCount = !checked ? countBlockedTasks(task.id) : 0;
 
-  // Build badge row
+  const tagsHtml = (task.tags && task.tags.length > 0)
+    ? `<div class="task-tags">${task.tags.map(t => `<span class="tag-chip">${escHtml(t)}</span>`).join('')}</div>`
+    : '';
+
   let badges = '';
-  if (isRec) {
-    badges += `<span class="tbadge tbadge-rec">↻ ${REC_LABELS[task.recurrence] || 'Recurring'}</span>`;
-    if (task.alertTime) {
-      badges += `<span class="tbadge tbadge-time">${formatTime12(task.alertTime)}</span>`;
-    }
-  }
   if (due && !checked) {
     badges += `<span class="tbadge tbadge-due ${due.cls}">${due.text}</span>`;
-  }
-  if (task.reminders && task.reminders.length > 0 && !checked) {
-    badges += `<span class="tbadge tbadge-reminders">🔔 ${task.reminders.length} reminder${task.reminders.length !== 1 ? 's' : ''}</span>`;
   }
   if (blocked) {
     const blockerTitle = getBlockerTitle(task);
@@ -1985,7 +1160,7 @@ function taskCardHTML(task) {
   const badgesHtml = badges ? `<div class="task-badges">${badges}</div>` : '';
 
   return `
-    <div class="task-card ${checked ? 'done' : ''} ${alert ? 'alert-pulse' : ''} ${isRec ? 'is-recurring' : ''} ${blocked ? 'blocked' : ''}" id="card-${task.id}" onclick="openEdit('${task.id}')"${!checked ? ' draggable="true"' : ''}>
+    <div class="task-card ${checked ? 'done' : ''} ${alert ? 'alert-pulse' : ''} ${blocked ? 'blocked' : ''}" id="card-${task.id}" onclick="openEdit('${task.id}')">
       ${alert ? '<div class="alert-dot"></div>' : ''}
       <div class="urgency-bar ${task.urgency}"></div>
       <div class="task-main">
@@ -1996,26 +1171,17 @@ function taskCardHTML(task) {
           <div class="task-title">${escHtml(task.title)}</div>
         </div>
         ${task.notes ? `<div class="task-notes">${escHtml(task.notes)}</div>` : ''}
+        ${tagsHtml}
         ${badgesHtml}
       </div>
-      ${!checked ? '<div class="drag-handle" title="Drag to reorder">⠿</div>' : ''}
     </div>`;
 }
 
-function escHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
 // ── Filters ──────────────────────────────────────────────────────────────────
-function setFilter(cat) {
-  activeFilter = cat;
+function setFilter(tag) {
+  activeFilter = tag;
   render();
 }
-
 
 function toggleDone() {
   doneCollapsed = !doneCollapsed;
@@ -2033,16 +1199,9 @@ function toggleTask(e, id) {
   }
   t.completed = !t.completed;
   t.updatedAt = new Date().toISOString();
-
-  if (t.completed && t.recurring) {
-    t.lastCompletedDate = todayStr();
-    snack('Done for today — resets at next occurrence ↻');
-  } else {
-    snack(t.completed ? '✓ Marked complete' : 'Moved back to active');
-  }
-
   save();
   render();
+  snack(t.completed ? '✓ Marked complete' : 'Moved back to active');
 }
 
 function deleteTask(id) {
@@ -2056,171 +1215,64 @@ function deleteTask(id) {
   snack(`"${removed.title.slice(0, 30)}" deleted`);
 }
 
+// Delete is a two-tap action — the first tap just arms it (button turns solid
+// red and says "Tap again"), so brushing past it on the way to Save can't
+// wipe out a task. It auto-disarms after a few seconds or when the modal
+// re-opens.
+function armDeleteConfirm() {
+  deleteConfirmPending = true;
+  const btn = document.getElementById('taskDeleteBtn');
+  btn.classList.add('confirm');
+  btn.textContent = '⚠️ Tap again to confirm delete';
+  clearTimeout(deleteConfirmTimer);
+  deleteConfirmTimer = setTimeout(resetDeleteConfirm, 3000);
+}
+
+function resetDeleteConfirm() {
+  deleteConfirmPending = false;
+  clearTimeout(deleteConfirmTimer);
+  const btn = document.getElementById('taskDeleteBtn');
+  if (!btn) return;
+  btn.classList.remove('confirm');
+  btn.textContent = '🗑️ Delete Task';
+}
+
 function deleteFromModal() {
   if (!editingId) return;
+  if (!deleteConfirmPending) {
+    armDeleteConfirm();
+    return;
+  }
+  resetDeleteConfirm();
   const id = editingId;
   closeModal('taskModal');
   deleteTask(id);
 }
 
 function clearDone() {
-  const doneProjects = projects.filter(p => isProjectComplete(p) || isProjectExpired(p));
-  const cnt = tasks.filter(t => t.completed).length + doneProjects.length;
+  const cnt = tasks.filter(t => t.completed).length;
   if (cnt === 0) { snack('Nothing to clear'); return; }
   tasks = tasks.filter(t => !t.completed);
-  projects = projects.filter(p => !isProjectComplete(p) && !isProjectExpired(p));
   save();
   render();
   closeSettings();
-  snack(`Cleared ${cnt} item${cnt !== 1 ? 's' : ''}`);
-}
-
-// ── Modal — Recurring section ─────────────────────────────────────────────────
-function toggleRecurring() {
-  isRecurring = !isRecurring;
-  document.getElementById('recToggleBtn').classList.toggle('on', isRecurring);
-  const sec = document.getElementById('recSection');
-  if (isRecurring) {
-    sec.style.display = 'block';
-    renderRecSection();
-  } else {
-    sec.style.display = 'none';
-  }
-}
-
-function selectRecurrence(r) {
-  selectedRecurrence = r;
-  const curTime = document.getElementById('fAlertTime')?.value || '09:00';
-  renderRecSection(curTime);
-}
-
-function selectDOW(d) {
-  selectedDayOfWeek = d;
-  const curTime = document.getElementById('fAlertTime')?.value || '09:00';
-  renderRecSection(curTime);
-}
-
-function renderRecSection(alertTimeVal) {
-  const timeVal = alertTimeVal || document.getElementById('fAlertTime')?.value || '09:00';
-  const sec = document.getElementById('recSection');
-
-  const patterns = ['daily', 'weekdays', 'weekly', 'monthly'];
-  const patternHtml = patterns.map(p =>
-    `<div class="rec-pattern-opt ${selectedRecurrence === p ? 'active' : ''}" onclick="selectRecurrence('${p}')">${REC_LABELS[p]}</div>`
-  ).join('');
-
-  let subHtml = '';
-  if (selectedRecurrence === 'weekly') {
-    const dowHtml = DOW_SHORT.map((d, i) =>
-      `<div class="dow-opt ${selectedDayOfWeek === i ? 'active' : ''}" onclick="selectDOW(${i})">${d}</div>`
-    ).join('');
-    subHtml = `
-      <div>
-        <div class="rec-sub-label">Day of week</div>
-        <div class="day-of-week-grid">${dowHtml}</div>
-      </div>`;
-  } else if (selectedRecurrence === 'monthly') {
-    subHtml = `
-      <div>
-        <div class="rec-sub-label">Day of month</div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <input type="number" min="1" max="31" value="${selectedDayOfMonth}" oninput="selectedDayOfMonth=parseInt(this.value)||1" />
-          <span style="font-size:13px;color:var(--text3)">of each month</span>
-        </div>
-      </div>`;
-  }
-
-  sec.innerHTML = `
-    <div class="rec-section">
-      <div>
-        <div class="rec-sub-label">Repeat</div>
-        <div class="rec-pattern-grid">${patternHtml}</div>
-      </div>
-      ${subHtml}
-      <div>
-        <div class="rec-sub-label">Alert time</div>
-        <div class="time-input-row">
-          <input type="time" id="fAlertTime" value="${timeVal}" />
-          <span class="time-input-hint">alert fires at this time</span>
-        </div>
-      </div>
-    </div>`;
-}
-
-// ── Modal — Reminders section ─────────────────────────────────────────────────
-function updateRemindersVisibility() {
-  const dueVal = document.getElementById('fDue').value;
-  document.getElementById('remindersGroup').style.display = dueVal ? 'block' : 'none';
-}
-
-function renderModalReminders() {
-  const container = document.getElementById('reminderPills');
-  if (modalReminders.length === 0) {
-    container.innerHTML = `<div class="no-reminders-hint">No reminders set — tap + Add to create one</div>`;
-    return;
-  }
-  container.innerHTML = modalReminders.map((rem, i) => `
-    <div class="reminder-pill">
-      <div class="reminder-pill-dot" style="background:${REM_COLORS[i % REM_COLORS.length]}"></div>
-      <div class="reminder-pill-label">${escHtml(rem.label)}</div>
-      <button class="reminder-pill-remove" onclick="removeReminder('${rem.id}')" aria-label="Remove">×</button>
-    </div>`).join('');
-}
-
-function showReminderPicker() {
-  reminderPickerVisible = !reminderPickerVisible;
-  document.getElementById('reminderPickerRow').style.display = reminderPickerVisible ? 'flex' : 'none';
-  document.getElementById('addReminderBtn').textContent = reminderPickerVisible ? '− Cancel' : '+ Add';
-}
-
-function confirmAddReminder() {
-  const sel    = document.getElementById('reminderSelect');
-  const amount = parseInt(sel.value);
-  const label  = sel.options[sel.selectedIndex].text;
-  if (modalReminders.find(r => r.amount === amount)) {
-    snack('That reminder is already set');
-    return;
-  }
-  modalReminders.push({ id: uid(), amount, label });
-  modalReminders.sort((a, b) => b.amount - a.amount); // furthest first
-  showReminderPicker(); // hide picker
-  renderModalReminders();
-}
-
-function removeReminder(remId) {
-  modalReminders = modalReminders.filter(r => r.id !== remId);
-  renderModalReminders();
+  snack(`Cleared ${cnt} task${cnt !== 1 ? 's' : ''}`);
 }
 
 // ── Task Modal ────────────────────────────────────────────────────────────────
-function renderCategoryChips() {
-  const container = document.getElementById('fCategoryChips');
-  container.innerHTML = categories.map(c => {
-    const active = selectedCategories.includes(c);
-    return `<div class="cat-sel-chip ${active ? 'active' : ''}" onclick="toggleCategoryChip('${escHtml(c)}')">${escHtml(c)}</div>`;
+function renderTagChips() {
+  const container = document.getElementById('fTagChips');
+  container.innerHTML = tags.map(t => {
+    const active = selectedTags.includes(t);
+    return `<div class="tag-sel-chip ${active ? 'active' : ''}" onclick="toggleTagChip('${escHtml(t)}')">${escHtml(t)}</div>`;
   }).join('');
 }
 
-function toggleCategoryChip(cat) {
-  const idx = selectedCategories.indexOf(cat);
-  if (idx === -1) selectedCategories.push(cat);
-  else selectedCategories.splice(idx, 1);
-  renderCategoryChips();
-}
-
-function resetModalRecurringState() {
-  isRecurring = false;
-  selectedRecurrence = 'daily';
-  selectedDayOfWeek = new Date().getDay() || 1;
-  selectedDayOfMonth = new Date().getDate();
-  modalReminders = [];
-  reminderPickerVisible = false;
-  document.getElementById('recToggleBtn').classList.remove('on');
-  document.getElementById('recSection').style.display = 'none';
-  document.getElementById('remindersGroup').style.display = 'none';
-  document.getElementById('reminderPickerRow').style.display = 'none';
-  document.getElementById('addReminderBtn').textContent = '+ Add';
-  renderModalReminders();
+function toggleTagChip(tag) {
+  const idx = selectedTags.indexOf(tag);
+  if (idx === -1) selectedTags.push(tag);
+  else selectedTags.splice(idx, 1);
+  renderTagChips();
 }
 
 function openAdd() {
@@ -2233,11 +1285,12 @@ function openAdd() {
   document.getElementById('autoBadge').textContent = '';
   document.getElementById('taskSaveBtn').textContent = 'Save Task';
   document.getElementById('taskDeleteBtn').style.display = 'none';
-  selectedCategories = [];
-  renderCategoryChips();
+  document.getElementById('taskDeleteDivider').style.display = 'none';
+  resetDeleteConfirm();
+  selectedTags = [];
+  renderTagChips();
   highlightUrgency('medium');
   selectedBlockedBy = null;
-  resetModalRecurringState();
   renderBlockedByField();
   openModal('taskModal');
   setTimeout(() => document.getElementById('fTitle').focus(), 350);
@@ -2246,91 +1299,54 @@ function openAdd() {
 function openEdit(id) {
   const t = tasks.find(t => t.id === id);
   if (!t) return;
-  editingId         = id;
-  selectedUrgency   = t.urgency;
-  isRecurring       = !!t.recurring;
-  selectedRecurrence = t.recurrence || 'daily';
-  selectedDayOfWeek  = t.alertDayOfWeek !== undefined ? t.alertDayOfWeek : (new Date().getDay() || 1);
-  selectedDayOfMonth = t.alertDayOfMonth || new Date().getDate();
-  modalReminders     = t.reminders ? t.reminders.map(r => ({ ...r })) : [];
-  reminderPickerVisible = false;
+  editingId       = id;
+  selectedUrgency = t.urgency;
 
   document.getElementById('modalTitle').textContent = 'Edit Task';
-  document.getElementById('fTitle').value  = t.title;
-  document.getElementById('fDue').value    = t.dueDate || '';
-  document.getElementById('fNotes').value  = t.notes || '';
+  document.getElementById('fTitle').value = t.title;
+  document.getElementById('fDue').value   = t.dueDate || '';
+  document.getElementById('fNotes').value = t.notes || '';
   document.getElementById('taskSaveBtn').textContent = 'Save Changes';
   document.getElementById('taskDeleteBtn').style.display = 'flex';
-  document.getElementById('recToggleBtn').classList.toggle('on', isRecurring);
+  document.getElementById('taskDeleteDivider').style.display = 'block';
+  resetDeleteConfirm();
 
-  const recSec = document.getElementById('recSection');
-  if (isRecurring) {
-    recSec.style.display = 'block';
-    renderRecSection(t.alertTime || '09:00');
-  } else {
-    recSec.style.display = 'none';
-  }
-
-  document.getElementById('reminderPickerRow').style.display = 'none';
-  document.getElementById('addReminderBtn').textContent = '+ Add';
-  renderModalReminders();
-  updateRemindersVisibility();
-
-  selectedBlockedBy = t.blockedBy || null;
-  selectedCategories = [...(t.categories || [])];
-  renderCategoryChips();
+  selectedTags = [...(t.tags || [])];
+  renderTagChips();
   if (t.dueDate) showAutoBadge(t.dueDate);
   else document.getElementById('autoBadge').textContent = '';
   highlightUrgency(t.urgency);
+
+  selectedBlockedBy = t.blockedBy || null;
   renderBlockedByField();
   openModal('taskModal');
 }
 
 function saveTask() {
-  const title    = document.getElementById('fTitle').value.trim();
+  const title = document.getElementById('fTitle').value.trim();
   if (!title) { snack('Please enter a task title'); return; }
 
-  const taskCategories = [...selectedCategories];
-  const dueDate  = document.getElementById('fDue').value || null;
-  const notes    = document.getElementById('fNotes').value.trim();
-  const urgency  = selectedUrgency;
+  const taskTags  = [...selectedTags];
+  const dueDate   = document.getElementById('fDue').value || null;
+  const notes     = document.getElementById('fNotes').value.trim();
+  const urgency   = selectedUrgency;
   const blockedBy = selectedBlockedBy || null;
-
-  // Recurring fields
-  const recurring        = isRecurring;
-  const recurrence       = recurring ? selectedRecurrence : null;
-  const alertTimeEl      = document.getElementById('fAlertTime');
-  const alertTime        = recurring && alertTimeEl ? alertTimeEl.value : null;
-  const alertDayOfWeek   = recurring && recurrence === 'weekly'  ? selectedDayOfWeek  : null;
-  const alertDayOfMonth  = recurring && recurrence === 'monthly' ? selectedDayOfMonth : null;
-  const reminders        = [...modalReminders];
 
   if (editingId) {
     const t = tasks.find(t => t.id === editingId);
     Object.assign(t, {
-      title, categories: taskCategories, urgency, dueDate, notes,
-      recurring, recurrence, alertTime, alertDayOfWeek, alertDayOfMonth,
-      reminders, blockedBy,
+      title, tags: taskTags, urgency, dueDate, notes, blockedBy,
       updatedAt: new Date().toISOString()
     });
     snack('Task updated');
   } else {
-    const activeOrders = tasks.filter(t => !t.completed && t.sortOrder !== undefined).map(t => t.sortOrder);
-    const newOrder     = activeOrders.length > 0 ? Math.min(...activeOrders) - 1 : 0;
     tasks.unshift({
-      id: uid(), title, categories: taskCategories, urgency, dueDate, notes,
-      recurring, recurrence, alertTime, alertDayOfWeek, alertDayOfMonth,
-      reminders, blockedBy,
+      id: uid(), title, tags: taskTags, urgency, dueDate, notes, blockedBy,
       completed: false,
-      createdAt: new Date().toISOString(),
-      sortOrder: newOrder,
-      firedDates: {},
-      lastCompletedDate: null
+      createdAt: new Date().toISOString()
     });
     snack('Task added');
   }
-
-  if (recurring || reminders.length > 0) requestNotifPermission();
 
   save();
   closeModal('taskModal');
@@ -2355,7 +1371,6 @@ function autoUrgencyFromDate() {
   showAutoBadge(dateStr);
   const auto = urgencyFromDate(dateStr);
   if (auto) { selectedUrgency = auto; highlightUrgency(auto); }
-  updateRemindersVisibility();
 }
 
 function showAutoBadge(dateStr) {
@@ -2368,202 +1383,11 @@ function showAutoBadge(dateStr) {
   }
 }
 
-// ── Settings Modal ────────────────────────────────────────────────────────────
-function openSettings() {
-  renderCatChips();
-  openModal('settingsModal');
-}
-
-function closeSettings() {
-  closeModal('settingsModal');
-}
-
-function renderCatChips() {
-  const container = document.getElementById('catChips');
-  container.innerHTML = categories.map(c => `
-    <div class="cat-chip-edit">
-      ${escHtml(c)}
-      <button onclick="removeCategory('${escHtml(c)}')" title="Remove">×</button>
-    </div>`).join('');
-}
-
-function addCategory() {
-  const input = document.getElementById('newCatInput');
-  const name  = input.value.trim();
-  if (!name) return;
-  if (categories.includes(name)) { snack('Category already exists'); return; }
-  categories.push(name);
-  save();
-  input.value = '';
-  renderCatChips();
-  render();
-  snack(`"${name}" added`);
-}
-
-function removeCategory(name) {
-  const inUse = tasks.some(t => (t.categories || []).includes(name));
-  if (inUse) { snack(`Can't remove — category is in use`); return; }
-  categories = categories.filter(c => c !== name);
-  save();
-  renderCatChips();
-  render();
-}
-
-
-// ── Drag and Drop ─────────────────────────────────────────────────────────────
-let dragSrcId = null;
-
-function initDnD() {
-  document.querySelectorAll('.task-card:not(.done)').forEach(card => {
-    const id     = card.id.replace('card-', '');
-    const handle = card.querySelector('.drag-handle');
-
-    card.addEventListener('dragstart', e => {
-      dragSrcId = id;
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', id);
-      setTimeout(() => card.classList.add('dragging'), 0);
-    });
-
-    card.addEventListener('dragover', e => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      if (card.id !== 'card-' + dragSrcId) {
-        document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
-        card.classList.add('drag-over');
-      }
-    });
-
-    card.addEventListener('dragleave', e => {
-      if (!card.contains(e.relatedTarget)) card.classList.remove('drag-over');
-    });
-
-    card.addEventListener('drop', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!dragSrcId || dragSrcId === id) return;
-      performDrop(dragSrcId, id);
-    });
-
-    card.addEventListener('dragend', () => {
-      card.classList.remove('dragging');
-      document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
-      dragSrcId = null;
-    });
-
-    if (handle) handle.addEventListener('touchstart', e => onTouchDragStart(e, card, id), { passive: false });
-  });
-}
-
-let touchDragId = null, touchDragCard = null, touchGhost = null;
-let touchOffsetX = 0, touchOffsetY = 0;
-
-function onTouchDragStart(e, card, id) {
-  e.preventDefault();
-  touchDragId   = id;
-  touchDragCard = card;
-  const touch = e.touches[0];
-  const rect  = card.getBoundingClientRect();
-  touchOffsetX = touch.clientX - rect.left;
-  touchOffsetY = touch.clientY - rect.top;
-
-  touchGhost = card.cloneNode(true);
-  Object.assign(touchGhost.style, {
-    position: 'fixed', width: rect.width + 'px',
-    left: rect.left + 'px', top: rect.top + 'px',
-    opacity: '0.85', zIndex: '1000', pointerEvents: 'none',
-    borderRadius: 'var(--radius)',
-    boxShadow: '0 8px 30px rgba(0,0,0,0.25)',
-    transform: 'scale(1.02)', transition: 'none',
-  });
-  document.body.appendChild(touchGhost);
-  card.style.opacity = '0.25';
-
-  document.addEventListener('touchmove', onTouchDragMove, { passive: false });
-  document.addEventListener('touchend', onTouchDragEnd,   { passive: false });
-}
-
-function onTouchDragMove(e) {
-  e.preventDefault();
-  if (!touchGhost) return;
-  const touch = e.touches[0];
-  touchGhost.style.left = (touch.clientX - touchOffsetX) + 'px';
-  touchGhost.style.top  = (touch.clientY - touchOffsetY) + 'px';
-
-  touchGhost.style.display = 'none';
-  const el = document.elementFromPoint(touch.clientX, touch.clientY);
-  touchGhost.style.display = '';
-  document.querySelectorAll('.task-card:not(.done)').forEach(c => c.classList.remove('drag-over'));
-  if (el) {
-    const target = el.closest('.task-card:not(.done)');
-    if (target && target.id !== 'card-' + touchDragId) target.classList.add('drag-over');
-  }
-}
-
-function onTouchDragEnd(e) {
-  document.removeEventListener('touchmove', onTouchDragMove);
-  document.removeEventListener('touchend', onTouchDragEnd);
-  if (touchGhost) { touchGhost.remove(); touchGhost = null; }
-  if (touchDragCard) touchDragCard.style.opacity = '';
-
-  const target = document.querySelector('.task-card.drag-over');
-  document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over', 'dragging'));
-
-  if (target && touchDragId) {
-    const targetId = target.id.replace('card-', '');
-    if (targetId !== touchDragId) performDrop(touchDragId, targetId);
-  }
-  touchDragId = null; touchDragCard = null;
-}
-
-function performDrop(srcId, tgtId) {
-  const allCards  = [...document.querySelectorAll('.task-card:not(.done)')];
-  const orderedIds = allCards.map(c => c.id.replace('card-', ''));
-
-  const srcPos = orderedIds.indexOf(srcId);
-  const tgtPos = orderedIds.indexOf(tgtId);
-  if (srcPos === -1 || tgtPos === -1) return;
-
-  orderedIds.splice(srcPos, 1);
-  orderedIds.splice(tgtPos, 0, srcId);
-
-  orderedIds.forEach((id, idx) => {
-    const task = tasks.find(t => t.id === id);
-    if (task) task.sortOrder = idx;
-  });
-  let maxOrder = orderedIds.length;
-  tasks.filter(t => !t.completed && !orderedIds.includes(t.id)).forEach(t => { t.sortOrder = maxOrder++; });
-
-  save();
-  render();
-  snack('Order updated');
-}
-
-// ── Modal helpers ─────────────────────────────────────────────────────────────
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) closeModal(overlay.id);
-  });
-});
-
-
-// ── Task Blocking ─────────────────────────────────────────────────────────────
-let selectedBlockedBy = null;
-
+// ── Task Blocking / Dependencies ──────────────────────────────────────────────
 function renderBlockedByField() {
   const container = document.getElementById('blockedByContent');
   const otherTasks = tasks.filter(t => !t.completed && t.id !== editingId);
-  
+
   if (selectedBlockedBy) {
     const blocker = tasks.find(t => t.id === selectedBlockedBy);
     const blockerTitle = blocker ? escHtml(blocker.title) : 'Unknown task';
@@ -2611,381 +1435,59 @@ function countBlockedTasks(taskId) {
   return tasks.filter(t => t.blockedBy === taskId && !t.completed).length;
 }
 
-// ── Projects ─────────────────────────────────────────────────────────────────
-function isProjectComplete(p) {
-  return p.steps.length > 0 && p.steps.every(s => s.completed);
+// ── Settings Modal ────────────────────────────────────────────────────────────
+function openSettings() {
+  renderTagList();
+  openModal('settingsModal');
 }
 
-function isProjectExpired(p) {
-  if (!p.expiryDays || !p.createdAt) return false;
-  const created = new Date(p.createdAt);
-  const now = new Date();
-  const diffDays = Math.floor((now - created) / 86400000);
-  return diffDays >= p.expiryDays;
+function closeSettings() {
+  closeModal('settingsModal');
 }
 
-function projectDoneCount(p) {
-  return p.steps.filter(s => s.completed).length;
+function renderTagList() {
+  const container = document.getElementById('tagChips');
+  container.innerHTML = tags.map(t => `
+    <div class="cat-chip-edit">
+      ${escHtml(t)}
+      <button onclick="removeTag('${escHtml(t)}')" title="Remove">×</button>
+    </div>`).join('');
 }
 
-function shouldResetProject(p) {
-  if (!p.recurrence || p.recurrence === 'once') return false;
-  // Check both completed and expired projects for reset
-  const isDone = p.lastCompletedDate || isProjectExpired(p);
-  if (!isDone) return false;
-  const refDate = p.lastCompletedDate || todayStr();
-  const today = todayStr();
-  if (p.lastCompletedDate >= today) return false;
-  const dow = new Date().getDay();
-  switch (p.recurrence) {
-    case 'daily':    return true;
-    case 'weekdays': return dow >= 1 && dow <= 5;
-    case 'weekly': {
-      const days = Math.floor((new Date(today) - new Date(p.lastCompletedDate)) / 86400000);
-      return days >= 7;
-    }
-    case 'monthly': {
-      const last = new Date(p.lastCompletedDate);
-      const now  = new Date(today);
-      return now.getMonth() !== last.getMonth() || now.getFullYear() !== last.getFullYear();
-    }
-    default: return true;
-  }
-}
-
-function autoResetProjects() {
-  let changed = false;
-  projects.forEach(p => {
-    if (isProjectComplete(p) && shouldResetProject(p)) {
-      p.steps.forEach(s => { s.completed = false; });
-      p.lastCompletedDate = null;
-      p.createdAt = new Date().toISOString();
-      changed = true;
-    }
-  });
-  if (changed) save();
-}
-
-function projectRecLabel(p) {
-  if (!p.recurrence || p.recurrence === 'once') return 'One-time';
-  const labels = { daily: 'Every day', weekdays: 'Weekdays', weekly: 'Weekly', monthly: 'Monthly' };
-  let label = labels[p.recurrence] || p.recurrence;
-  if (p.recurrence === 'weekly' && p.alertDayOfWeek !== undefined) {
-    label = 'Every ' + DOW_SHORT[p.alertDayOfWeek];
-  }
-  if (p.recurrence === 'monthly' && p.alertDayOfMonth) {
-    const d = p.alertDayOfMonth;
-    const suffix = d === 1 || d === 21 || d === 31 ? 'st' : d === 2 || d === 22 ? 'nd' : d === 3 || d === 23 ? 'rd' : 'th';
-    label = d + suffix + ' of month';
-  }
-  return label;
-}
-
-function projectCardHTML(p) {
-  const done = projectDoneCount(p);
-  const total = p.steps.length;
-  const expired = isProjectExpired(p);
-  const allDone = isProjectComplete(p) || expired;
-  const expanded = !!p.expanded;
-  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-
-  let progressBadgeCls, progressBadgeStyle;
-  if (allDone) {
-    progressBadgeStyle = 'background:var(--accent-soft);color:var(--accent)';
-  } else if (done > 0) {
-    progressBadgeStyle = 'background:#fff8ef;color:#ff9500';
-  } else {
-    progressBadgeStyle = 'background:var(--surface2);color:var(--text3)';
-  }
-
-  let stepsHtml = '';
-  if (expanded && !allDone) {
-    let foundNextStep = false;
-    stepsHtml = '<div class="project-steps">' + p.steps.map(s => {
-      if (s.completed) {
-        return `<div class="project-step done">
-          <button class="project-step-check checked" onclick="event.stopPropagation();toggleProjectStep('${p.id}','${s.id}')" aria-label="Toggle step"></button>
-          <span class="project-step-text">${escHtml(s.text)}</span>
-        </div>`;
-      }
-      // Check if blocked by sequential mode or by a specific step
-      const seqLocked = p.sequential && foundNextStep;
-      const stepBlocker = s.blockedBy ? p.steps.find(bs => bs.id === s.blockedBy) : null;
-      const stepBlocked = stepBlocker && !stepBlocker.completed;
-      const isLocked = seqLocked || stepBlocked;
-      if (!foundNextStep) foundNextStep = true;
-      if (isLocked) {
-        const reason = stepBlocked ? escHtml(stepBlocker.text) : '';
-        return `<div class="project-step locked">
-          <div class="project-step-lock"><svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          <span class="project-step-text">${escHtml(s.text)}</span>
-          ${stepBlocked ? `<span class="project-step-blocked-badge">← ${reason}</span>` : ''}
-        </div>`;
-      }
-      return `<div class="project-step">
-        <button class="project-step-check" onclick="event.stopPropagation();toggleProjectStep('${p.id}','${s.id}')" aria-label="Toggle step"></button>
-        <span class="project-step-text">${escHtml(s.text)}</span>
-      </div>`;
-    }).join('') + '</div>';
-  }
-
-  const chevron = allDone
-    ? `<div style="width:20px;height:20px;border-radius:50%;background:var(--text3);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l3 3 4-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`
-    : `<div class="project-chevron">▶</div>`;
-
-  const progressBar = expanded && !allDone
-    ? `<div class="project-progress-bar"><div class="project-progress-fill" style="width:${pct}%"></div></div>`
-    : '';
-
-  return `
-    <div class="project-card ${allDone ? 'all-done' : ''} ${expanded && !allDone ? 'expanded' : ''}" id="proj-${p.id}">
-      <div class="project-header" onclick="toggleProjectExpand('${p.id}')">
-        <div class="project-header-row">
-          <div class="project-header-left">
-            ${chevron}
-            <span class="project-name">${escHtml(p.name)}</span>
-          </div>
-          <div class="project-header-badges">
-            <button class="project-edit-btn" onclick="event.stopPropagation();openEditProject('${p.id}')" title="Edit project">✏️</button>
-            <span class="project-rec-badge">${p.recurrence && p.recurrence !== 'once' ? '↻ ' : ''}${escHtml(projectRecLabel(p))}</span>${expired && !isProjectComplete(p) ? '<span class="project-progress-badge" style="background:var(--surface2);color:var(--text3)">Expired</span>' : ''}
-            <span class="project-progress-badge" style="${progressBadgeCls || ''}${progressBadgeStyle}">${done} of ${total}</span>
-          </div>
-        </div>
-        ${progressBar}
-      </div>
-      ${stepsHtml}
-    </div>`;
-}
-
-function toggleProjectExpand(id) {
-  const p = projects.find(p => p.id === id);
-  if (!p || isProjectComplete(p)) {
-    openEditProject(id);
-    return;
-  }
-  p.expanded = !p.expanded;
+function addTag() {
+  const input = document.getElementById('newTagInput');
+  const name  = input.value.trim();
+  if (!name) return;
+  if (tags.includes(name)) { snack('Tag already exists'); return; }
+  tags.push(name);
   save();
-  render();
-}
-
-function toggleProjectStep(projectId, stepId) {
-  const p = projects.find(p => p.id === projectId);
-  if (!p) return;
-  const s = p.steps.find(s => s.id === stepId);
-  if (!s) return;
-  // Check if blocked
-  if (!s.completed && s.blockedBy) {
-    const blocker = p.steps.find(bs => bs.id === s.blockedBy);
-    if (blocker && !blocker.completed) {
-      snack('Complete "' + blocker.text.slice(0,30) + '" first');
-      return;
-    }
-  }
-  s.completed = !s.completed;
-
-  if (isProjectComplete(p)) {
-    p.lastCompletedDate = todayStr();
-    p.expanded = false;
-    snack(p.recurrence === 'once' || !p.recurrence ? 'Project complete ✓' : 'Project complete — resets at next occurrence ↻');
-  }
-
-  save();
-  render();
-}
-
-// ── Project Modal ────────────────────────────────────────────────────────────
-function renderPmSteps() {
-  const container = document.getElementById('pmStepsList');
-  if (projectModalSteps.length === 0) {
-    container.innerHTML = '<div class="pm-no-steps">No steps yet — add at least one</div>';
-    return;
-  }
-  container.innerHTML = projectModalSteps.map((s, i) => {
-    const otherSteps = projectModalSteps.filter(os => os.id !== s.id);
-    const blockerName = s.blockedBy ? (projectModalSteps.find(os => os.id === s.blockedBy) || {}).text || '' : '';
-    let blockerHtml = '';
-    if (otherSteps.length > 0) {
-      if (s.blockedBy) {
-        blockerHtml = `<div class="pm-step-blocker"><span class="pm-step-blocker-label">Blocked by:</span><select onchange="setStepBlocker('${s.id}',this.value)"><option value="">None</option>${otherSteps.map(os => `<option value="${os.id}"${os.id === s.blockedBy ? ' selected' : ''}>${escHtml(os.text.slice(0,40))}</option>`).join('')}</select></div>`;
-      } else {
-        blockerHtml = `<div class="pm-step-blocker"><span class="pm-step-blocker-label">Blocked by:</span><select onchange="setStepBlocker('${s.id}',this.value)"><option value="">None</option>${otherSteps.map(os => `<option value="${os.id}">${escHtml(os.text.slice(0,40))}</option>`).join('')}</select></div>`;
-      }
-    }
-    return `<div>
-      <div class="pm-step-row">
-        <span class="pm-step-num">${i + 1}</span>
-        <span class="pm-step-text">${escHtml(s.text)}</span>
-        <button class="pm-step-remove" onclick="removeProjectStep('${s.id}')" aria-label="Remove">×</button>
-      </div>
-      ${blockerHtml}
-    </div>`;
-  }).join('');
-}
-
-function addProjectStep() {
-  const input = document.getElementById('pmNewStep');
-  const text = input.value.trim();
-  if (!text) return;
-  projectModalSteps.push({ id: uid(), text, completed: false });
   input.value = '';
-  renderPmSteps();
-  input.focus();
-}
-
-function setStepBlocker(stepId, blockerStepId) {
-  const step = projectModalSteps.find(s => s.id === stepId);
-  if (step) {
-    step.blockedBy = blockerStepId || null;
-  }
-}
-
-function removeProjectStep(stepId) {
-  // Unblock any steps blocked by the removed step
-  projectModalSteps.forEach(s => { if (s.blockedBy === stepId) s.blockedBy = null; });
-  projectModalSteps = projectModalSteps.filter(s => s.id !== stepId);
-  renderPmSteps();
-}
-
-function renderPmRecurrence() {
-  const grid = document.getElementById('pmRecGrid');
-  const patterns = ['once', 'daily', 'weekdays', 'weekly', 'monthly'];
-  const pmLabels = { once: 'Once', ...REC_LABELS };
-  grid.innerHTML = patterns.map(p =>
-    `<div class="rec-pattern-opt ${pmSelectedRecurrence === p ? 'active' : ''}" onclick="selectPmRecurrence('${p}')">${pmLabels[p]}</div>`
-  ).join('');
-
-  const sub = document.getElementById('pmRecSub');
-  if (pmSelectedRecurrence === 'weekly') {
-    const dowHtml = DOW_SHORT.map((d, i) =>
-      `<div class="dow-opt ${pmSelectedDayOfWeek === i ? 'active' : ''}" onclick="selectPmDOW(${i})">${d}</div>`
-    ).join('');
-    sub.innerHTML = `<div class="form-group"><div class="rec-sub-label" style="font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--text3);margin-bottom:7px">Day of week</div><div class="day-of-week-grid">${dowHtml}</div></div>`;
-  } else if (pmSelectedRecurrence === 'monthly') {
-    sub.innerHTML = `<div class="form-group"><div class="rec-sub-label" style="font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--text3);margin-bottom:7px">Day of month</div><div style="display:flex;align-items:center;gap:10px"><input type="number" min="1" max="31" value="${pmSelectedDayOfMonth}" oninput="pmSelectedDayOfMonth=parseInt(this.value)||1" /><span style="font-size:13px;color:var(--text3)">of each month</span></div></div>`;
-  } else {
-    sub.innerHTML = '';
-  }
-}
-
-function selectPmRecurrence(r) {
-  pmSelectedRecurrence = r;
-  renderPmRecurrence();
-}
-
-function selectPmDOW(d) {
-  pmSelectedDayOfWeek = d;
-  renderPmRecurrence();
-}
-
-function openAddProject() {
-  editingProjectId = null;
-  projectModalSteps = [];
-  pmSelectedRecurrence = 'once';
-  pmSelectedDayOfWeek = 0;
-  pmSelectedDayOfMonth = 1;
-  document.getElementById('pmTitle').textContent = 'New Project';
-  document.getElementById('pmName').value = '';
-  document.getElementById('pmSaveBtn').textContent = 'Save Project';
-  document.getElementById('pmDeleteBtn').style.display = 'none';
-  document.getElementById('pmExpiry').value = '';
-  pmSequential = false;
-  document.getElementById('pmSequentialBtn').classList.remove('on');
-  renderPmSteps();
-  renderPmRecurrence();
-  openModal('projectModal');
-  setTimeout(() => document.getElementById('pmName').focus(), 350);
-}
-
-function openEditProject(id) {
-  const p = projects.find(p => p.id === id);
-  if (!p) return;
-  editingProjectId = id;
-  projectModalSteps = p.steps.map(s => ({ ...s }));
-  pmSelectedRecurrence = p.recurrence || 'weekly';
-  pmSelectedDayOfWeek = p.alertDayOfWeek !== undefined ? p.alertDayOfWeek : 0;
-  pmSelectedDayOfMonth = p.alertDayOfMonth || 1;
-  document.getElementById('pmTitle').textContent = 'Edit Project';
-  document.getElementById('pmName').value = p.name;
-  document.getElementById('pmSaveBtn').textContent = 'Save Changes';
-  document.getElementById('pmDeleteBtn').style.display = 'flex';
-  document.getElementById('pmExpiry').value = p.expiryDays || '';
-  pmSequential = !!p.sequential;
-  document.getElementById('pmSequentialBtn').classList.toggle('on', pmSequential);
-  renderPmSteps();
-  renderPmRecurrence();
-  openModal('projectModal');
-}
-
-function saveProject() {
-  const name = document.getElementById('pmName').value.trim();
-  if (!name) { snack('Please enter a project name'); return; }
-  if (projectModalSteps.length === 0) { snack('Add at least one step'); return; }
-  const expiryDays = parseInt(document.getElementById('pmExpiry').value) || null;
-
-  if (editingProjectId) {
-    const p = projects.find(p => p.id === editingProjectId);
-    if (p) {
-      p.name = name;
-      // Preserve completion state for existing steps, add new ones
-      const oldStepIds = new Set(p.steps.map(s => s.id));
-      const newSteps = projectModalSteps.map(ms => {
-        const existing = p.steps.find(s => s.id === ms.id);
-        return existing ? { ...existing, text: ms.text, blockedBy: ms.blockedBy || null } : { ...ms, completed: false, blockedBy: ms.blockedBy || null };
-      });
-      p.steps = newSteps;
-      p.recurrence = pmSelectedRecurrence;
-      p.alertDayOfWeek = pmSelectedRecurrence === 'weekly' ? pmSelectedDayOfWeek : null;
-      p.alertDayOfMonth = pmSelectedRecurrence === 'monthly' ? pmSelectedDayOfMonth : null;
-      p.expiryDays = expiryDays;
-      p.sequential = pmSequential;
-    }
-    snack('Project updated');
-  } else {
-    projects.push({
-      id: uid(),
-      name,
-      steps: projectModalSteps.map(s => ({ ...s, completed: false })),
-      recurrence: pmSelectedRecurrence,
-      alertDayOfWeek: pmSelectedRecurrence === 'weekly' ? pmSelectedDayOfWeek : null,
-      alertDayOfMonth: pmSelectedRecurrence === 'monthly' ? pmSelectedDayOfMonth : null,
-      expiryDays,
-      sequential: pmSequential,
-      expanded: false,
-      lastCompletedDate: null,
-      createdAt: new Date().toISOString()
-    });
-    snack('Project created');
-  }
-
-  save();
-  closeModal('projectModal');
+  renderTagList();
   render();
+  snack(`"${name}" added`);
 }
 
-function deleteProjectFromModal() {
-  if (!editingProjectId) return;
-  projects = projects.filter(p => p.id !== editingProjectId);
+function removeTag(name) {
+  const inUse = tasks.some(t => (t.tags || []).includes(name));
+  if (inUse) { snack(`Can't remove — tag is in use`); return; }
+  tags = tags.filter(t => t !== name);
   save();
-  closeModal('projectModal');
+  renderTagList();
   render();
-  snack('Project deleted');
 }
 
 // ── Force Update ──────────────────────────────────────────────────────────────
 async function forceUpdate() {
   snack('Clearing cache…');
   try {
-    // Unregister all service workers
     if (navigator.serviceWorker) {
       const regs = await navigator.serviceWorker.getRegistrations();
       for (const reg of regs) await reg.unregister();
     }
-    // Clear all caches
     if (window.caches) {
       const names = await caches.keys();
       for (const name of names) await caches.delete(name);
     }
-    // Reload from network
     setTimeout(() => location.reload(true), 500);
   } catch(e) {
     console.error('Force update failed', e);
@@ -2993,97 +1495,51 @@ async function forceUpdate() {
   }
 }
 
+// ── Modal helpers ─────────────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
 // ── Events ────────────────────────────────────────────────────────────────────
 document.getElementById('addBtn').addEventListener('click', openAdd);
-document.getElementById('projectBtn').addEventListener('click', openAddProject);
 document.getElementById('gearBtn').addEventListener('click', openSettings);
 document.getElementById('taskSaveBtn').addEventListener('click', saveTask);
-document.getElementById('pmSaveBtn').addEventListener('click', saveProject);
-document.getElementById('pmCancelBtn').addEventListener('click', () => closeModal('projectModal'));
 document.getElementById('taskCancelBtn').addEventListener('click', () => closeModal('taskModal'));
 
 document.getElementById('fTitle').addEventListener('keydown', e => {
   if (e.key === 'Enter') saveTask();
 });
-document.getElementById('newCatInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addCategory();
+document.getElementById('newTagInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addTag();
 });
-document.getElementById('pmNewStep').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addProjectStep();
-});
-document.getElementById('pmName').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('pmNewStep').focus();
-});
-
-// ── Sync scheduled notifications to the Service Worker ───────────────────────
-function syncNotificationsToSW() {
-  if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
-  const today = todayStr();
-  const pending = [];
-  tasks.filter(t => !t.completed).forEach(task => {
-    if (!task.firedDates) task.firedDates = {};
-
-    // Recurring alerts
-    if (task.recurring && task.alertTime && isRecurringToday(task)) {
-      if (task.firedDates['alert'] !== today) {
-        pending.push({
-          id: task.id + '-alert',
-          title: task.title,
-          body: `${REC_LABELS[task.recurrence] || 'Recurring'} · ${formatTime12(task.alertTime)}`,
-          time: task.alertTime,
-          date: today
-        });
-      }
-    }
-
-    // Lead-time reminders
-    if (task.dueDate && task.reminders && task.reminders.length > 0) {
-      task.reminders.forEach(rem => {
-        const fireDate = subtractDays(task.dueDate, rem.amount);
-        const key = 'rem-' + rem.id;
-        if (task.firedDates[key] !== today && fireDate === today) {
-          const daysText = rem.amount === 0 ? 'due today' : `due in ${rem.amount} day${rem.amount !== 1 ? 's' : ''}`;
-          pending.push({
-            id: task.id + '-' + key,
-            title: '⏰ ' + task.title,
-            body: `"${task.title}" is ${daysText}`,
-            time: '09:00',  // default morning for date-based reminders
-            date: today
-          });
-        }
-      });
-    }
-  });
-  navigator.serviceWorker.controller.postMessage({ type: 'SYNC_NOTIFICATIONS', pending });
-}
 
 // ── Service Worker ────────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => navigator.serviceWorker.ready)
-    .then(() => {
-      syncNotificationsToSW();
-      // Request periodic background sync if available
-      if ('periodicSync' in navigator.serviceWorker.ready) {
-        navigator.serviceWorker.ready.then(reg => {
-          reg.periodicSync.register('check-notifications', { minInterval: 60 * 60 * 1000 })
-            .catch(() => {}); // fails silently if permission not granted
-        });
-      }
-    })
-    .catch(err => console.warn('SW registration failed', err));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('[SW] Registered, scope:', reg.scope))
+      .catch(err => console.warn('[SW] Registration failed:', err));
+  });
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 load();
 migrate();
-autoResetRecurring();
-autoResetProjects();
 localStorage.setItem('todo_version', VERSION);
 document.getElementById('versionLabel').textContent = `v${VERSION}`;
 render();
-checkScheduler();                        // fire immediately on load — catches up on missed alerts
-setInterval(checkScheduler, 30000);     // check every 30s (was 60s — tighter loop reduces missed minutes)
 </script>
 </body>
 </html>
