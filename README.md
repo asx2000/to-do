@@ -4,8 +4,14 @@ A simple, fast, urgency-based to-do app — built as a PWA so it installs on any
 
 ## Features
 
-- Every item is a task; tag tasks with one or more tags to organize and filter them
-- Dependencies: mark a task "blocked by" another — it locks until the blocker is done
+- **Today view** — a focused list of at most 5 tasks a day (overdue first, then by urgency). Repeating tasks live in their own "Routines" strip and don't count toward the 5. Anything beyond the cap waits under "More due today"; each task can be pushed to tomorrow
+- **Repeating tasks** — daily, weekly, monthly or every N days. Checking one off rolls it to its next due date (counted from the old due date)
+- **Chains** — mark a task "blocked by" another; only the current step of a chain shows on Today ("⛓ Step 1 of 3 · next: Review")
+- **Later** — tasks due more than 7 days out fold into a collapsed "Later" section on All tasks
+- **Someday** — tasks with no due date and Low urgency are parked on their own tab, off the main list
+- **Stale-task nudge** — after a task is pushed to tomorrow 3 times you're asked to do it, break it down, park it or delete it
+- **Checklists in notes** — start a line with `- [ ]` and it becomes a tappable checkbox; cards show progress like `☑ 2/4`
+- Tag tasks with one or more tags to organize and filter them
 - Urgency levels: Critical, High, Medium, Low (auto-set from due date, or set manually)
 - Due dates with overdue alerts
 - Works offline via Service Worker caching

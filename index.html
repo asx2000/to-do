@@ -28,6 +28,8 @@
       --text3:       #9999aa;
       --accent:      #5b5ef4;
       --accent-soft: #ededfd;
+      --good:        #1f9d55;
+      --good-soft:   #e8f6ee;
 
       --critical:      #ff3b30;
       --critical-soft: #fff0ef;
@@ -65,6 +67,8 @@
         --text3:       #55556a;
         --accent:      #7b7ef8;
         --accent-soft: #1e1e38;
+        --good:        #3ecf7a;
+        --good-soft:   #12261b;
 
         --critical-soft: #2a1518;
         --high-soft:     #2a1e0e;
@@ -474,6 +478,7 @@
 
     input[type="text"],
     input[type="date"],
+    input[type="number"],
     textarea,
     select {
       width: 100%;
@@ -491,10 +496,11 @@
     }
     input[type="text"]:focus,
     input[type="date"]:focus,
+    input[type="number"]:focus,
     textarea:focus,
     select:focus { border-color: var(--accent); }
 
-    textarea { resize: none; height: 72px; }
+    textarea { resize: none; height: 96px; }
 
     select {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236e6e80' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -750,6 +756,166 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
+
+    /* ── View tabs ── */
+    .tabs-wrap { padding: 10px 16px 0; flex-shrink: 0; }
+    .tabs {
+      display: flex;
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 3px;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 8px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text2);
+      border-radius: 8px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.15s;
+    }
+    .tab.active {
+      background: var(--surface);
+      color: var(--accent);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    /* ── Today view ── */
+    .today-progress { margin: 2px 4px 14px; }
+    .today-progress .tp-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    .today-progress .tp-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .today-progress .tp-bar i {
+      display: block;
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    .routines { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .routine {
+      flex: 1 1 calc(50% - 4px);
+      min-width: 140px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 11px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .routine .check-btn { width: 20px; height: 20px; margin-top: 0; }
+    .routine .r-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .routine .r-flag { font-size: 11px; font-weight: 600; color: var(--critical); }
+    .more-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      cursor: pointer;
+      margin: 6px 0 10px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .more-row b { color: var(--accent); font-weight: 600; }
+    .push-btn {
+      background: var(--surface2);
+      border: none;
+      color: var(--text2);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 5px 9px;
+      cursor: pointer;
+      flex-shrink: 0;
+      align-self: flex-start;
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .push-btn:active { opacity: 0.6; }
+    .tbadge-chain  { background: var(--good-soft); color: var(--good); }
+    .tbadge-check  { background: var(--surface2); color: var(--text2); }
+    .tbadge-pushed { background: var(--critical-soft); color: var(--critical); }
+    .tbadge-repeat { background: var(--accent-soft); color: var(--accent); }
+
+    /* ── Checklist (in notes) ── */
+    .checklist { margin-top: 8px; }
+    .ck-item { display: flex; align-items: center; gap: 10px; padding: 6px 2px; font-size: 15px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .ck-box {
+      width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 12px; font-weight: 700;
+    }
+    .ck-item.on .ck-box { background: var(--accent); border-color: var(--accent); }
+    .ck-item.on span { text-decoration: line-through; color: var(--text3); }
+    .btn-link {
+      background: none; border: none; color: var(--accent); font-size: 13px; font-weight: 600;
+      cursor: pointer; padding: 6px 0; font-family: inherit;
+    }
+    .repeat-n { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 14px; color: var(--text2); }
+    .repeat-n input { width: 90px; }
+
+    /* ── Stale nudge ── */
+    .nudge-q { font-size: 14px; color: var(--text2); margin: -12px 0 14px; }
+    .nudge-task {
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--high);
+      border-radius: 12px;
+      padding: 11px 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+    .nudge-task small { display: block; font-weight: 500; font-size: 12px; color: var(--critical); margin-top: 3px; }
+    .nudge-opt {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 13px 14px;
+      margin-top: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nudge-opt span { font-size: 12px; font-weight: 500; color: var(--text2); text-align: right; }
+    .nudge-opt.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .nudge-opt.primary span { color: #dcdcff; }
+    .nudge-opt.danger { color: var(--critical); }
+    .nudge-opt.danger.confirm { background: var(--critical); border-color: var(--critical); color: #fff; }
+    .nudge-opt.danger.confirm span { color: #ffe0de; }
+    .nudge-hint { text-align: center; font-size: 12px; color: var(--text3); margin-top: 14px; }
+
+    .snack.has-action { pointer-events: auto; }
+    .snack button {
+      background: none; border: none; color: #9fa1ff; font-weight: 700; font-size: 14px;
+      margin-left: 16px; cursor: pointer; font-family: inherit;
+    }
   </style>
 </head>
 <body>
@@ -765,6 +931,13 @@
     </div>
   </header>
 
+  <div class="tabs-wrap">
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-view="today" onclick="setView('today')">Today</div>
+      <div class="tab" data-view="all" onclick="setView('all')">All tasks</div>
+      <div class="tab" data-view="someday" onclick="setView('someday')">Someday</div>
+    </div>
+  </div>
   <div class="filter-bar" id="filterBar"></div>
   <div class="list-area" id="listArea"></div>
 </div>
@@ -809,14 +982,23 @@
       <div class="auto-badge" id="autoBadge"></div>
     </div>
 
+    <div class="form-group">
+      <label>Repeat <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <div class="tag-selector" id="fRepeatChips"></div>
+      <div id="fRepeatN"></div>
+      <div class="auto-badge" id="repeatHint"></div>
+    </div>
+
     <div class="form-group" id="blockedByGroup">
       <label>Blocked by <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
       <div id="blockedByContent"></div>
     </div>
 
     <div class="form-group">
-      <label>Notes (optional)</label>
-      <textarea id="fNotes" placeholder="Any extra details…"></textarea>
+      <label>Notes &amp; checklist (optional)</label>
+      <textarea id="fNotes" placeholder="Any extra details… start a line with - [ ] for a checkbox" oninput="renderChecklist()"></textarea>
+      <div class="checklist" id="fChecklist"></div>
+      <button type="button" class="btn-link" onclick="addCkItem()">+ Add checklist item</button>
     </div>
 
     <div class="modal-actions">
@@ -830,6 +1012,21 @@
     <button class="btn-delete-modal" id="taskDeleteBtn" style="display:none" onclick="deleteFromModal()">
       🗑️ Delete Task
     </button>
+  </div>
+</div>
+
+<!-- Stale-task nudge -->
+<div class="modal-overlay" id="nudgeModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Still stuck on this one?</h2>
+    <div class="nudge-q">You've pushed it to tomorrow 3 times. What would help?</div>
+    <div class="nudge-task" id="nudgeTask"></div>
+    <button class="nudge-opt primary" onclick="nudgeDo()">Do it now <span>Keeps it #1 on Today</span></button>
+    <button class="nudge-opt" onclick="nudgeBreak()">Break it down <span>Adds a checklist</span></button>
+    <button class="nudge-opt" onclick="nudgeSomeday()">Move to Someday <span>Off the main list</span></button>
+    <button class="nudge-opt danger" id="nudgeDeleteBtn" onclick="nudgeDelete()">Delete <span>Not doing it</span></button>
+    <div class="nudge-hint">Shown once per task, after the 3rd push</div>
   </div>
 </div>
 
@@ -876,7 +1073,7 @@
 
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
-const VERSION = '2.0';
+const VERSION = '2.1';
 
 // ── State ────────────────────────────────────────────────────────────────────
 let tasks = [];
@@ -890,6 +1087,18 @@ let doneCollapsed = false;
 let selectedBlockedBy = null;
 let deleteConfirmPending = false;
 let deleteConfirmTimer = null;
+
+// v2.1: Today view, repeats, Later/Someday, stale nudge, checklists
+const DAILY_CAP    = 5;   // max open tasks Today offers you per day (repeats excluded)
+const LATER_DAYS   = 7;   // due further out than this folds into "Later"
+const STALE_PUSHES = 3;   // pushes to tomorrow before the nudge appears
+let view = 'today';       // 'today' | 'all' | 'someday'
+let laterOpen = false;
+let overflowOpen = false;
+let selectedRepeat = null;   // null | 'daily' | 'weekly' | 'monthly' | 'days'
+let selectedRepeatN = 2;
+let nudgeId = null;
+let nudgeDeleteArmed = false;
 
 const DEFAULT_TAGS = ['Work', 'Personal', 'Health', 'Finance', 'Other'];
 
@@ -1014,6 +1223,29 @@ function migrate() {
     localStorage.removeItem('todo_cats');
   }
 
+  if (prev < '2.1') {
+    // Add the v2.1 fields. Undated Low-urgency tasks (nothing to schedule) are
+    // parked in Someday so the main list only shows what matters now.
+    let parked = 0;
+    tasks.forEach(t => {
+      if (t.repeat === undefined) t.repeat = null;
+      if (t.repeatN === undefined) t.repeatN = null;
+      if (t.pushCount === undefined) t.pushCount = 0;
+      if (t.nudged === undefined) t.nudged = false;
+      if (t.someday === undefined) {
+        t.someday = !t.completed && !t.dueDate && t.urgency === 'low' && !t.blockedBy;
+        if (t.someday) parked++;
+      }
+      if (t.completed && !t.completedOn) {
+        const d = new Date(t.updatedAt || t.createdAt || Date.now());
+        t.completedOn = toISO(d);
+      }
+    });
+    if (parked > 0) {
+      setTimeout(() => snack(`${parked} undated low-priority task${parked !== 1 ? 's' : ''} moved to Someday`, 4000), 900);
+    }
+  }
+
   save();
   localStorage.setItem('todo_version', VERSION);
   console.log(`Migrated todo data ${prev} → ${VERSION}`);
@@ -1039,6 +1271,108 @@ function urgencyFromDate(dateStr) {
   return 'low';
 }
 
+function toISO(d) {
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+function todayStr() { return toISO(new Date()); }
+function addDays(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  return toISO(d);
+}
+function addMonths(dateStr, n, anchorDay) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const day = anchorDay || d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + n);
+  const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, last));
+  return toISO(d);
+}
+function shortDate(dateStr) {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-AU', { month: 'short', day: 'numeric' });
+}
+
+// ── Repeat ────────────────────────────────────────────────────────────────────
+// Completing a repeating task doesn't create a duplicate — it advances the same
+// task to its next due date, counted from the OLD due date (so paying rent late
+// doesn't push next month back). It always lands in the future.
+// anchorDay keeps "the 31st" from drifting to the 28th after a short month.
+function stepDate(dateStr, rep, n, anchorDay) {
+  if (rep === 'daily')   return addDays(dateStr, 1);
+  if (rep === 'weekly')  return addDays(dateStr, 7);
+  if (rep === 'monthly') return addMonths(dateStr, 1, anchorDay);
+  return addDays(dateStr, Math.max(1, parseInt(n, 10) || 1));
+}
+function nextDueDate(base, rep, n, anchorDay) {
+  const today = todayStr();
+  let next = stepDate(base || today, rep, n, anchorDay);
+  while (next <= today) next = stepDate(next, rep, n, anchorDay);
+  return next;
+}
+function repeatLabel(t) {
+  if (t.repeat === 'daily')   return 'Daily';
+  if (t.repeat === 'weekly')  return 'Weekly';
+  if (t.repeat === 'monthly') return 'Monthly';
+  if (t.repeat === 'days')    return `Every ${t.repeatN || 1} day${(t.repeatN || 1) !== 1 ? 's' : ''}`;
+  return '';
+}
+// Repeating tasks derive urgency from their (moving) due date, so a monthly
+// task is Low all month and Critical when it comes due.
+function effUrgency(t) {
+  if (t.repeat && t.dueDate) return urgencyFromDate(t.dueDate) || t.urgency;
+  return t.urgency;
+}
+
+// ── Checklist lines inside notes ("- [ ] item" / "- [x] item") ───────────────
+const CK_RE = /^\s*[-*]\s\[( |x|X)\]\s?(.*)$/;
+function parseNotes(notes) {
+  return (notes || '').split('\n').map((line, i) => {
+    const m = line.match(CK_RE);
+    return m ? { i, ck: true, done: m[1] !== ' ', text: m[2] } : { i, ck: false, text: line };
+  });
+}
+function checklistStats(notes) {
+  const items = parseNotes(notes).filter(x => x.ck);
+  return { total: items.length, done: items.filter(x => x.done).length };
+}
+function plainNotes(notes) {
+  return parseNotes(notes).filter(x => !x.ck).map(x => x.text).join('\n').trim();
+}
+function toggleCkLine(notes, idx) {
+  return (notes || '').split('\n').map((line, i) => {
+    if (i !== idx || !CK_RE.test(line)) return line;
+    return /\[ \]/.test(line) ? line.replace('[ ]', '[x]') : line.replace(/\[(x|X)\]/, '[ ]');
+  }).join('\n');
+}
+function resetChecklist(notes) {
+  return (notes || '').split('\n').map(l => CK_RE.test(l) ? l.replace(/\[(x|X)\]/, '[ ]') : l).join('\n');
+}
+
+// ── Chains (dependencies): where does this task sit? ─────────────────────────
+function chainInfo(t) {
+  let step = 1, cur = t;
+  const up = new Set([t.id]);
+  while (cur.blockedBy) {
+    const p = tasks.find(x => x.id === cur.blockedBy);
+    if (!p || up.has(p.id)) break;
+    up.add(p.id); step++; cur = p;
+  }
+  let total = step, next = null, c = t;
+  const down = new Set([t.id]);
+  for (;;) {
+    const child = tasks
+      .filter(x => x.blockedBy === c.id && !down.has(x.id))
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0];
+    if (!child) break;
+    down.add(child.id);
+    if (!next) next = child;
+    total++; c = child;
+  }
+  return total > 1 ? { step, total, next } : null;
+}
+
 const URGENCY_LABEL = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
 const URGENCY_ICON  = { critical: '🔴', high: '🟠', medium: '🟡', low: '⚪' };
 const URGENCY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
@@ -1059,11 +1393,23 @@ function dueLabel(dateStr) {
   return { text: dt.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' }), cls: '' };
 }
 
-function snack(msg, ms = 2200) {
+let snackTimer = null;
+function snack(msg, ms = 2200, action = null) {
   const el = document.getElementById('snack');
-  el.textContent = msg;
+  el.innerHTML = '';
+  const span = document.createElement('span');
+  span.textContent = msg;
+  el.appendChild(span);
+  if (action) {
+    const btn = document.createElement('button');
+    btn.textContent = action.label;
+    btn.onclick = () => { el.classList.remove('show'); action.fn(); };
+    el.appendChild(btn);
+  }
+  el.classList.toggle('has-action', !!action);
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), ms);
+  clearTimeout(snackTimer);
+  snackTimer = setTimeout(() => el.classList.remove('show'), action ? Math.max(ms, 5000) : ms);
 }
 
 function escHtml(s) {
@@ -1076,24 +1422,55 @@ function escHtml(s) {
 
 // ── Rendering ────────────────────────────────────────────────────────────────
 function render() {
+  renderTabs();
   renderFilterBar();
   renderList();
   updateSubtitle();
 }
 
+function setView(v) {
+  view = v;
+  overflowOpen = false;
+  render();
+  document.getElementById('listArea').scrollTop = 0;
+}
+
+function renderTabs() {
+  document.querySelectorAll('#tabs .tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === view);
+  });
+}
+
+// Tasks in scope for the tag filter bar on the current tab.
+function viewScopeTasks() {
+  return tasks.filter(t => !t.completed && (view === 'someday' ? t.someday : !t.someday));
+}
+
 function updateSubtitle() {
-  const active = tasks.filter(t => !t.completed);
   const el = document.getElementById('subtitle');
-  el.textContent = active.length === 0 ? 'All done ✓' : `${active.length} task${active.length !== 1 ? 's' : ''} remaining`;
+  if (view === 'today') {
+    el.textContent = new Date().toLocaleDateString('en-AU', { weekday: 'long', month: 'short', day: 'numeric' });
+  } else if (view === 'someday') {
+    const n = tasks.filter(t => !t.completed && t.someday).length;
+    el.textContent = n === 0 ? 'Nothing parked' : `${n} idea${n !== 1 ? 's' : ''} parked`;
+  } else {
+    const active = tasks.filter(t => !t.completed && !t.someday);
+    const later = active.filter(isLater).length;
+    el.textContent = active.length === 0 ? 'All done ✓'
+      : `${active.length} active` + (later ? ` · ${later} later` : '');
+  }
 }
 
 function renderFilterBar() {
   const bar = document.getElementById('filterBar');
+  if (view === 'today') { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const scope = viewScopeTasks();
   const counts = {};
-  tasks.filter(t => !t.completed).forEach(t => {
+  scope.forEach(t => {
     (t.tags || []).forEach(tag => { counts[tag] = (counts[tag] || 0) + 1; });
   });
-  const totalActive = tasks.filter(t => !t.completed).length;
+  const totalActive = scope.length;
 
   const allActive = activeFilter === 'all';
   let html = `<div class="pill ${allActive ? 'active' : ''}" onclick="setFilter('all')">All<span class="pill-count">${totalActive}</span></div>`;
@@ -1107,53 +1484,166 @@ function renderFilterBar() {
   bar.innerHTML = html;
 }
 
+function isLater(t) {
+  return !!t.dueDate && daysUntil(t.dueDate) > LATER_DAYS;
+}
+
+// Sort used by All tasks / Someday: unblocked first, then urgency, due date, newest.
+function compareTasks(a, b) {
+  const aBlocked = isTaskBlocked(a) ? 1 : 0;
+  const bBlocked = isTaskBlocked(b) ? 1 : 0;
+  if (aBlocked !== bBlocked) return aBlocked - bBlocked;
+  const uo = URGENCY_ORDER[effUrgency(a)] - URGENCY_ORDER[effUrgency(b)];
+  if (uo !== 0) return uo;
+  if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);
+  if (a.dueDate) return -1;
+  if (b.dueDate) return 1;
+  return new Date(b.createdAt) - new Date(a.createdAt);
+}
+
+// Today ranking: "locked in" tasks first, then overdue, urgency, due date.
+function compareToday(a, b) {
+  const today = todayStr();
+  const fa = a.focusDate === today ? 0 : 1, fb = b.focusDate === today ? 0 : 1;
+  if (fa !== fb) return fa - fb;
+  const oa = a.dueDate && daysUntil(a.dueDate) < 0 ? 0 : 1;
+  const ob = b.dueDate && daysUntil(b.dueDate) < 0 ? 0 : 1;
+  if (oa !== ob) return oa - ob;
+  const uo = URGENCY_ORDER[effUrgency(a)] - URGENCY_ORDER[effUrgency(b)];
+  if (uo !== 0) return uo;
+  if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);
+  if (a.dueDate) return -1;
+  if (b.dueDate) return 1;
+  return new Date(a.createdAt) - new Date(b.createdAt);
+}
+
+// What belongs on Today: due today or overdue, undated Critical tasks, and
+// chain steps whose blocker is done (the "next action"). Blocked steps never
+// appear — only the current step of a chain does.
+function todayCandidates() {
+  return tasks.filter(t => {
+    if (t.completed || t.someday || isTaskBlocked(t)) return false;
+    if (t.dueDate) return daysUntil(t.dueDate) <= 0;
+    return effUrgency(t) === 'critical' || !!t.blockedBy;
+  });
+}
+
 function renderList() {
   const area = document.getElementById('listArea');
-  let filtered = tasks.filter(t => activeFilter === 'all' || (t.tags || []).includes(activeFilter));
+  if (view === 'today') return renderToday(area);
+  if (view === 'someday') return renderSomeday(area);
+  return renderAll(area);
+}
 
-  const active = filtered.filter(t => !t.completed)
-    .sort((a, b) => {
-      // Blocked tasks sink to the bottom
-      const aBlocked = isTaskBlocked(a) ? 1 : 0;
-      const bBlocked = isTaskBlocked(b) ? 1 : 0;
-      if (aBlocked !== bBlocked) return aBlocked - bBlocked;
-      const uo = URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency];
-      if (uo !== 0) return uo;
-      if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);
-      if (a.dueDate) return -1;
-      if (b.dueDate) return 1;
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-
-  const done = filtered.filter(t => t.completed)
-    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
-
-  if (active.length === 0 && done.length === 0) {
-    area.innerHTML = `<div class="empty-state"><div class="emoji">✅</div><p>No tasks here.<br>Tap <strong>+</strong> to add one.</p></div>`;
-    return;
-  }
+function renderToday(area) {
+  const today = todayStr();
+  const cands = todayCandidates();
+  const routines = cands.filter(t => t.repeat).sort(compareToday);
+  const rest = cands.filter(t => !t.repeat).sort(compareToday);
+  const doneToday = tasks.filter(t => t.completed && !t.repeat && t.completedOn === today).length;
+  const slots = Math.max(0, DAILY_CAP - doneToday);
+  const shown = rest.slice(0, slots);
+  const overflow = rest.slice(slots);
 
   let html = '';
-  if (active.length > 0) {
-    html += active.map(t => taskCardHTML(t)).join('');
+  const pct = Math.min(100, Math.round(doneToday / DAILY_CAP * 100));
+  html += `<div class="today-progress">
+    <div class="tp-row"><span>${doneToday} of ${DAILY_CAP} done</span><span>${shown.length ? shown.length + ' to go' : (doneToday >= DAILY_CAP ? 'Goal reached' : '')}</span></div>
+    <div class="tp-bar"><i style="width:${pct}%"></i></div>
+  </div>`;
+
+  if (shown.length > 0) {
+    html += shown.map(t => taskCardHTML(t, { today: true })).join('');
+  } else if (rest.length === 0 && routines.length === 0) {
+    html += `<div class="empty-state"><div class="emoji">🎉</div><p>${doneToday > 0 ? 'All done for today.' : 'Nothing due today.'}<br>Add a task with <strong>+</strong>, or check <strong>All tasks</strong>.</p></div>`;
+  } else if (rest.length > 0) {
+    html += `<div class="empty-state" style="padding:28px 20px"><div class="emoji">✅</div><p>Today is clear — you've done ${doneToday}.</p></div>`;
   }
 
-  if (done.length > 0) {
-    const arrow = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
-    html += `<div class="done-toggle ${doneCollapsed ? 'collapsed' : ''}" onclick="toggleDone()">${arrow} Completed (${done.length})</div>`;
-    if (!doneCollapsed) {
-      html += done.map(t => taskCardHTML(t)).join('');
-    }
+  if (routines.length > 0) {
+    html += `<div class="section-label">Routines</div><div class="routines">` + routines.map(t => {
+      const overdue = t.dueDate && daysUntil(t.dueDate) < 0;
+      return `<div class="routine" onclick="openEdit('${t.id}')">
+        <button class="check-btn" onclick="toggleTask(event,'${t.id}')" aria-label="Done"></button>
+        <span class="r-title">${escHtml(t.title)}</span>${overdue ? '<span class="r-flag">late</span>' : ''}
+      </div>`;
+    }).join('') + `</div>`;
+  }
+
+  if (overflow.length > 0) {
+    html += `<div class="more-row" onclick="toggleOverflow()"><span>More due today · ${overflow.length}</span><b>${overflowOpen ? 'Hide' : 'Show'}</b></div>`;
+    if (overflowOpen) html += overflow.map(t => taskCardHTML(t, { today: true })).join('');
   }
 
   area.innerHTML = html;
 }
 
-function taskCardHTML(task) {
+function toggleOverflow() {
+  overflowOpen = !overflowOpen;
+  renderList();
+}
+
+function renderAll(area) {
+  const filtered = tasks.filter(t => !t.someday && (activeFilter === 'all' || (t.tags || []).includes(activeFilter)));
+  const active = filtered.filter(t => !t.completed);
+  const later = active.filter(isLater).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  const soon = active.filter(t => !isLater(t)).sort(compareTasks);
+  const done = filtered.filter(t => t.completed)
+    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+  const somedayCount = tasks.filter(t => !t.completed && t.someday).length;
+  const arrow = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+  if (active.length === 0 && done.length === 0 && somedayCount === 0) {
+    area.innerHTML = `<div class="empty-state"><div class="emoji">✅</div><p>No tasks here.<br>Tap <strong>+</strong> to add one.</p></div>`;
+    return;
+  }
+
+  let html = '';
+  if (later.length > 0 && soon.length > 0) html += `<div class="section-label">Next ${LATER_DAYS} days</div>`;
+  html += soon.map(t => taskCardHTML(t)).join('');
+  if (active.length === 0) html += `<div class="empty-state" style="padding:28px 20px"><p>Nothing active here.</p></div>`;
+
+  if (later.length > 0) {
+    html += `<div class="done-toggle ${laterOpen ? '' : 'collapsed'}" onclick="toggleLater()">${arrow} Later (${later.length}) · due in ${LATER_DAYS + 1}+ days</div>`;
+    if (laterOpen) html += later.map(t => taskCardHTML(t)).join('');
+  }
+
+  if (somedayCount > 0) {
+    html += `<div class="more-row" onclick="setView('someday')"><span>Someday · ${somedayCount}</span><b>Open →</b></div>`;
+  }
+
+  if (done.length > 0) {
+    html += `<div class="done-toggle ${doneCollapsed ? 'collapsed' : ''}" onclick="toggleDone()">${arrow} Completed (${done.length})</div>`;
+    if (!doneCollapsed) html += done.map(t => taskCardHTML(t)).join('');
+  }
+  area.innerHTML = html;
+}
+
+function toggleLater() {
+  laterOpen = !laterOpen;
+  renderList();
+}
+
+function renderSomeday(area) {
+  const list = tasks
+    .filter(t => !t.completed && t.someday && (activeFilter === 'all' || (t.tags || []).includes(activeFilter)))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  if (list.length === 0) {
+    area.innerHTML = `<div class="empty-state"><div class="emoji">💭</div><p>Nothing parked here.<br>Tasks with no date and Low urgency land in Someday,<br>or use “Move to Someday” from the nudge.</p></div>`;
+    return;
+  }
+  area.innerHTML = list.map(t => taskCardHTML(t, { someday: true })).join('');
+}
+
+function taskCardHTML(task, opts = {}) {
   const due     = dueLabel(task.dueDate);
   const checked = task.completed;
   const blocked = !checked && isTaskBlocked(task);
-  const alert   = !blocked && (isOverdueAlert(task) || (!checked && task.urgency === 'critical'));
+  const urg     = effUrgency(task);
+  // Today already is the "due now" list, so only truly overdue items pulse there.
+  const alert   = !blocked && !task.someday && !checked && (opts.today
+    ? (!!task.dueDate && daysUntil(task.dueDate) < 0)
+    : (isOverdueAlert(task) || urg === 'critical'));
   const blocksCount = !checked ? countBlockedTasks(task.id) : 0;
 
   const tagsHtml = (task.tags && task.tags.length > 0)
@@ -1164,27 +1654,53 @@ function taskCardHTML(task) {
   if (due && !checked) {
     badges += `<span class="tbadge tbadge-due ${due.cls}">${due.text}</span>`;
   }
+  if (task.repeat && !checked) {
+    badges += `<span class="tbadge tbadge-repeat">↻ ${repeatLabel(task)}</span>`;
+  }
+  if (!checked) {
+    const ch = chainInfo(task);
+    if (ch) {
+      badges += `<span class="tbadge tbadge-chain">⛓ Step ${ch.step} of ${ch.total}` +
+        (ch.next && !blocked ? ` · next: ${escHtml(ch.next.title.slice(0, 18))}` : '') + `</span>`;
+    }
+  }
+  const ck = checklistStats(task.notes);
+  if (ck.total > 0) {
+    badges += `<span class="tbadge tbadge-check">☑ ${ck.done}/${ck.total}</span>`;
+  }
+  if (!checked && (task.pushCount || 0) >= 2) {
+    badges += `<span class="tbadge tbadge-pushed">Pushed ${task.pushCount}×</span>`;
+  }
   if (blocked) {
     const blockerTitle = getBlockerTitle(task);
     badges += `<span class="tbadge tbadge-blocked"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="vertical-align:-1px"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Blocked by: ${escHtml((blockerTitle || '').slice(0, 30))}</span>`;
   }
-  if (blocksCount > 0) {
+  if (blocksCount > 0 && !chainInfo(task)) {
     badges += `<span class="tbadge tbadge-blocks">Blocks ${blocksCount} task${blocksCount !== 1 ? 's' : ''}</span>`;
   }
   const badgesHtml = badges ? `<div class="task-badges">${badges}</div>` : '';
 
+  let extra = '';
+  if (opts.today && !checked) {
+    extra = `<button class="push-btn" onclick="pushTask(event,'${task.id}')" title="Push to tomorrow">Tomorrow ›</button>`;
+  } else if (opts.someday) {
+    extra = `<button class="push-btn" onclick="activateTask(event,'${task.id}')" title="Move back to your task list">Activate</button>`;
+  }
+  const notesShown = plainNotes(task.notes);
+
   return `
     <div class="task-card ${checked ? 'done' : ''} ${alert ? 'alert-pulse' : ''} ${blocked ? 'blocked' : ''}" id="card-${task.id}" onclick="openEdit('${task.id}')">
       ${alert ? '<div class="alert-dot"></div>' : ''}
-      <div class="urgency-bar ${task.urgency}"></div>
+      <div class="urgency-bar ${urg}"></div>
       <div class="task-main">
         <div class="task-top">
           ${blocked
             ? '<div class="check-btn" style="pointer-events:none"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>'
             : `<button class="check-btn ${checked ? 'checked' : ''}" onclick="toggleTask(event,'${task.id}')" aria-label="Toggle"></button>`}
           <div class="task-title">${escHtml(task.title)}</div>
+          ${extra}
         </div>
-        ${task.notes ? `<div class="task-notes">${escHtml(task.notes)}</div>` : ''}
+        ${notesShown ? `<div class="task-notes">${escHtml(notesShown)}</div>` : ''}
         ${tagsHtml}
         ${badgesHtml}
       </div>
@@ -1203,6 +1719,14 @@ function toggleDone() {
 }
 
 // ── Task CRUD ─────────────────────────────────────────────────────────────────
+function restoreTask(snap) {
+  const i = tasks.findIndex(x => x.id === snap.id);
+  if (i === -1) return;
+  tasks[i] = snap;
+  save();
+  render();
+}
+
 function toggleTask(e, id) {
   e.stopPropagation();
   const t = tasks.find(t => t.id === id);
@@ -1211,11 +1735,130 @@ function toggleTask(e, id) {
     snack('This task is blocked — complete the blocker first');
     return;
   }
+  const before = JSON.parse(JSON.stringify(t));
+  const undo = { label: 'Undo', fn: () => restoreTask(before) };
+
+  // Repeating task: roll forward to the next occurrence instead of completing.
+  if (!t.completed && t.repeat) {
+    const next = nextDueDate(t.dueDate, t.repeat, t.repeatN, t.repeatDay);
+    t.dueDate = next;
+    t.notes = resetChecklist(t.notes);
+    t.pushCount = 0;
+    t.focusDate = null;
+    t.updatedAt = new Date().toISOString();
+    save();
+    render();
+    snack(`✓ Done · next due ${shortDate(next)}`, 2200, undo);
+    return;
+  }
+
   t.completed = !t.completed;
+  t.completedOn = t.completed ? todayStr() : null;
   t.updatedAt = new Date().toISOString();
   save();
   render();
-  snack(t.completed ? '✓ Marked complete' : 'Moved back to active');
+  if (t.completed) snack('✓ Marked complete', 2200, undo);
+  else snack('Moved back to active');
+}
+
+// ── Push to tomorrow / stale nudge / Someday ─────────────────────────────────
+function pushTask(e, id) {
+  e.stopPropagation();
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  const before = JSON.parse(JSON.stringify(t));
+  t.dueDate = addDays(todayStr(), 1);
+  t.pushCount = (t.pushCount || 0) + 1;
+  t.focusDate = null;
+  t.updatedAt = new Date().toISOString();
+  const nudge = t.pushCount >= STALE_PUSHES && !t.nudged;
+  if (nudge) t.nudged = true;
+  save();
+  render();
+  if (nudge) { openNudge(id); return; }
+  snack('Pushed to tomorrow', 2200, { label: 'Undo', fn: () => restoreTask(before) });
+}
+
+function openNudge(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  nudgeId = id;
+  document.getElementById('snack').classList.remove('show');
+  resetNudgeDelete();
+  document.getElementById('nudgeTask').innerHTML =
+    `${escHtml(t.title)}<small>Pushed ${t.pushCount}× · keeps slipping</small>`;
+  openModal('nudgeModal');
+}
+
+function resetNudgeDelete() {
+  nudgeDeleteArmed = false;
+  const b = document.getElementById('nudgeDeleteBtn');
+  b.classList.remove('confirm');
+  b.innerHTML = 'Delete <span>Not doing it</span>';
+}
+
+function nudgeDo() {
+  const t = tasks.find(t => t.id === nudgeId);
+  closeModal('nudgeModal');
+  if (!t) return;
+  t.dueDate = todayStr();
+  t.focusDate = todayStr();
+  t.pushCount = 0;
+  t.updatedAt = new Date().toISOString();
+  save(); render();
+  snack('Locked in as #1 for today');
+}
+
+function nudgeBreak() {
+  const t = tasks.find(t => t.id === nudgeId);
+  closeModal('nudgeModal');
+  if (!t) return;
+  t.pushCount = 0;
+  save();
+  openEdit(t.id);
+  const ta = document.getElementById('fNotes');
+  if (checklistStats(ta.value).total === 0) {
+    ta.value = (ta.value && !ta.value.endsWith('\n') ? ta.value + '\n' : ta.value) + '- [ ] ';
+    renderChecklist();
+  }
+  setTimeout(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 350);
+}
+
+function nudgeSomeday() {
+  const t = tasks.find(t => t.id === nudgeId);
+  closeModal('nudgeModal');
+  if (!t) return;
+  t.someday = true;
+  t.dueDate = null;
+  t.pushCount = 0;
+  t.updatedAt = new Date().toISOString();
+  save(); render();
+  snack('Moved to Someday');
+}
+
+function nudgeDelete() {
+  if (!nudgeDeleteArmed) {
+    nudgeDeleteArmed = true;
+    const b = document.getElementById('nudgeDeleteBtn');
+    b.classList.add('confirm');
+    b.innerHTML = 'Tap again to delete <span>Can\'t be undone</span>';
+    return;
+  }
+  closeModal('nudgeModal');
+  resetNudgeDelete();
+  deleteTask(nudgeId);
+}
+
+function activateTask(e, id) {
+  e.stopPropagation();
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  t.someday = false;
+  // Otherwise the "no date + Low = Someday" rule would park it again on next save.
+  if (!t.dueDate && t.urgency === 'low') t.urgency = 'medium';
+  t.updatedAt = new Date().toISOString();
+  save(); render();
+  snack('Moved to All tasks');
 }
 
 function deleteTask(id) {
@@ -1306,6 +1949,11 @@ function openAdd() {
   highlightUrgency('medium');
   selectedBlockedBy = null;
   renderBlockedByField();
+  // Adding from the Today tab? Assume it's for today (urgency stays as chosen).
+  if (view === 'today') document.getElementById('fDue').value = todayStr();
+  selectedRepeat = null; selectedRepeatN = 2;
+  renderRepeatField();
+  renderChecklist();
   openModal('taskModal');
   setTimeout(() => document.getElementById('fTitle').focus(), 350);
 }
@@ -1333,6 +1981,10 @@ function openEdit(id) {
 
   selectedBlockedBy = t.blockedBy || null;
   renderBlockedByField();
+  selectedRepeat = t.repeat || null;
+  selectedRepeatN = t.repeatN || 2;
+  renderRepeatField();
+  renderChecklist();
   openModal('taskModal');
 }
 
@@ -1345,26 +1997,103 @@ function saveTask() {
   const notes     = document.getElementById('fNotes').value.trim();
   const urgency   = selectedUrgency;
   const blockedBy = selectedBlockedBy || null;
+  const repeat    = selectedRepeat || null;
+  const repeatN   = repeat === 'days' ? Math.max(1, parseInt(selectedRepeatN, 10) || 1) : null;
+  // A repeating task needs a date to repeat from.
+  let due = dueDate;
+  if (repeat && !due) due = todayStr();
 
-  if (editingId) {
-    const t = tasks.find(t => t.id === editingId);
+  const existing = editingId ? tasks.find(t => t.id === editingId) : null;
+  // Remember the day-of-month a monthly task is anchored to (kept while the
+  // due date is unchanged, otherwise taken from the new date).
+  const repeatDay = repeat === 'monthly'
+    ? (existing && existing.repeat === 'monthly' && existing.dueDate === due && existing.repeatDay
+        ? existing.repeatDay : new Date(due + 'T00:00:00').getDate())
+    : null;
+  // Someday: no date + Low urgency (and not repeating / chained), or already parked.
+  // Giving it a due date brings it back.
+  let someday;
+  if (due) someday = false;
+  else if (urgency === 'low' && !repeat && !blockedBy) someday = true;
+  else someday = existing ? !!existing.someday : false;
+
+  if (existing) {
+    const t = existing;
+    const pushCount = due !== t.dueDate ? 0 : (t.pushCount || 0);
     Object.assign(t, {
-      title, tags: taskTags, urgency, dueDate, notes, blockedBy,
+      title, tags: taskTags, urgency, dueDate: due, notes, blockedBy,
+      repeat, repeatN, repeatDay, someday, pushCount,
       updatedAt: new Date().toISOString()
     });
     snack('Task updated');
   } else {
     tasks.unshift({
-      id: uid(), title, tags: taskTags, urgency, dueDate, notes, blockedBy,
-      completed: false,
+      id: uid(), title, tags: taskTags, urgency, dueDate: due, notes, blockedBy,
+      repeat, repeatN, repeatDay, someday, pushCount: 0, nudged: false,
+      completed: false, completedOn: null,
       createdAt: new Date().toISOString()
     });
     snack('Task added');
   }
+  if (someday && view !== 'someday') snack('Saved to Someday (no date, low urgency)', 3000);
 
   save();
   closeModal('taskModal');
   render();
+}
+
+// ── Repeat field ─────────────────────────────────────────────────────────────
+function renderRepeatField() {
+  const opts = [['', 'Never'], ['daily', 'Daily'], ['weekly', 'Weekly'], ['monthly', 'Monthly'], ['days', 'Every N days']];
+  document.getElementById('fRepeatChips').innerHTML = opts.map(([v, label]) =>
+    `<div class="tag-sel-chip ${(selectedRepeat || '') === v ? 'active' : ''}" onclick="setRepeat('${v}')">${label}</div>`
+  ).join('');
+  document.getElementById('fRepeatN').innerHTML = selectedRepeat === 'days'
+    ? `<div class="repeat-n">Every <input type="number" id="fRepeatNInput" min="1" max="365" value="${selectedRepeatN}" oninput="setRepeatN(this.value)"> days</div>`
+    : '';
+  updateRepeatHint();
+}
+
+function setRepeat(v) {
+  selectedRepeat = v || null;
+  renderRepeatField();
+}
+
+function setRepeatN(v) {
+  selectedRepeatN = v;
+  updateRepeatHint();
+}
+
+function updateRepeatHint() {
+  const el = document.getElementById('repeatHint');
+  if (!selectedRepeat) { el.textContent = ''; return; }
+  const due = document.getElementById('fDue').value || null;
+  const next = nextDueDate(due, selectedRepeat, selectedRepeatN);
+  el.innerHTML = `Next: <span>${shortDate(next)}</span> · set automatically when you check this off`;
+}
+
+// ── Checklist preview under the notes box ────────────────────────────────────
+function renderChecklist() {
+  const ta = document.getElementById('fNotes');
+  const items = parseNotes(ta.value).filter(x => x.ck);
+  document.getElementById('fChecklist').innerHTML = items.map(x =>
+    `<div class="ck-item ${x.done ? 'on' : ''}" onclick="toggleCk(${x.i})"><div class="ck-box">${x.done ? '✓' : ''}</div><span>${escHtml(x.text) || '…'}</span></div>`
+  ).join('');
+}
+
+function toggleCk(i) {
+  const ta = document.getElementById('fNotes');
+  ta.value = toggleCkLine(ta.value, i);
+  renderChecklist();
+}
+
+function addCkItem() {
+  const ta = document.getElementById('fNotes');
+  const v = ta.value;
+  ta.value = v + (v && !v.endsWith('\n') ? '\n' : '') + '- [ ] ';
+  renderChecklist();
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
 }
 
 // ── Urgency selection ─────────────────────────────────────────────────────────
@@ -1383,6 +2112,7 @@ function highlightUrgency(u) {
 function autoUrgencyFromDate() {
   const dateStr = document.getElementById('fDue').value;
   showAutoBadge(dateStr);
+  updateRepeatHint();
   const auto = urgencyFromDate(dateStr);
   if (auto) { selectedUrgency = auto; highlightUrgency(auto); }
 }
