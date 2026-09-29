@@ -148,54 +148,6 @@
     }
     .btn-add:active { transform: scale(0.93); box-shadow: none; }
 
-    /* ── Tag Filter ── */
-    .filter-bar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 16px;
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-    }
-    .filter-bar::-webkit-scrollbar { display: none; }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 13px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 500;
-      white-space: nowrap;
-      cursor: pointer;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      color: var(--text2);
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .pill.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-    .pill .pill-count {
-      background: rgba(255,255,255,0.25);
-      border-radius: 10px;
-      padding: 0 5px;
-      font-size: 11px;
-      line-height: 18px;
-      min-width: 18px;
-      text-align: center;
-    }
-    .pill:not(.active) .pill-count {
-      background: var(--surface2);
-      color: var(--text3);
-    }
-
     /* ── Task List ── */
     .list-area {
       flex: 1;
@@ -331,23 +283,6 @@
       line-height: 1.5;
     }
 
-    /* ── Tag chips on the card ── */
-    .task-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 7px;
-    }
-    .tag-chip {
-      font-size: 11px;
-      font-weight: 500;
-      padding: 2px 8px;
-      border-radius: 8px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      white-space: nowrap;
-    }
-
     /* ── Task Badges ── */
     .task-badges {
       display: flex;
@@ -377,7 +312,7 @@
       color: var(--high);
     }
 
-    /* ── Tag Chip Selector (multi-select, in modal) ── */
+    /* ── Chip selector (Repeat options in the modal) ── */
     .tag-selector {
       display: flex;
       flex-wrap: wrap;
@@ -663,9 +598,6 @@
       margin-bottom: 10px;
     }
 
-    .cat-row { display: flex; gap: 8px; }
-    .cat-row input { flex: 1; }
-
     .btn-sm {
       padding: 10px 14px;
       border-radius: var(--radius-sm);
@@ -679,29 +611,6 @@
       -webkit-tap-highlight-color: transparent;
     }
     .btn-sm:active { opacity: 0.75; }
-
-    .cat-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
-    .cat-chip-edit {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--surface2);
-      border-radius: 20px;
-      padding: 5px 10px 5px 12px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text2);
-    }
-    .cat-chip-edit button {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 15px;
-      line-height: 1;
-      padding: 0 2px;
-    }
-    .cat-chip-edit button:active { color: var(--critical); }
 
     .btn-danger {
       width: 100%;
@@ -938,7 +847,6 @@
       <div class="tab" data-view="someday" onclick="setView('someday')">Someday</div>
     </div>
   </div>
-  <div class="filter-bar" id="filterBar"></div>
   <div class="list-area" id="listArea"></div>
 </div>
 
@@ -951,11 +859,6 @@
     <div class="form-group">
       <label>Task</label>
       <input type="text" id="fTitle" placeholder="What needs to be done?" maxlength="120" />
-    </div>
-
-    <div class="form-group">
-      <label>Tags <span style="font-weight:400;text-transform:none;letter-spacing:0">(select one or more)</span></label>
-      <div class="tag-selector" id="fTagChips"></div>
     </div>
 
     <div class="form-group">
@@ -1037,20 +940,6 @@
     <h2>Settings</h2>
 
     <div class="settings-section">
-      <h3>Tags</h3>
-      <div class="cat-row">
-        <input type="text" id="newTagInput" placeholder="New tag name…" maxlength="24" />
-        <button class="btn-sm" onclick="addTag()">Add</button>
-      </div>
-      <div class="cat-chips" id="tagChips"></div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Default View <span style="font-weight:400;text-transform:none;letter-spacing:0">(shown when the app opens)</span></h3>
-      <div class="tag-selector" id="defaultFilterChips"></div>
-    </div>
-
-    <div class="settings-section">
       <h3>App</h3>
       <button class="btn-sm" style="width:100%;text-align:center" onclick="forceUpdate()">Force Update (clear cache)</button>
       <div style="font-size:12px;color:var(--text3);margin-top:6px;text-align:center">Clears cached files and reloads the latest version</div>
@@ -1073,16 +962,13 @@
 
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
-const VERSION = '2.1';
+const VERSION = '2.2';
 
 // ── State ────────────────────────────────────────────────────────────────────
 let tasks = [];
-let tags = [];
-let activeFilter = 'all';
-let defaultFilter = 'all';
+let tags = [];   // legacy: only used to migrate old data; tags are no longer shown in the UI
 let editingId = null;
 let selectedUrgency = 'medium';
-let selectedTags = [];
 let doneCollapsed = false;
 let selectedBlockedBy = null;
 let deleteConfirmPending = false;
@@ -1106,7 +992,6 @@ const DEFAULT_TAGS = ['Work', 'Personal', 'Health', 'Finance', 'Other'];
 function save() {
   localStorage.setItem('todo_tasks', JSON.stringify(tasks));
   localStorage.setItem('todo_tags', JSON.stringify(tags));
-  localStorage.setItem('todo_default_filter', defaultFilter);
 }
 
 function load() {
@@ -1122,12 +1007,6 @@ function load() {
   } catch(e) {
     tasks = [];
     tags = [...DEFAULT_TAGS];
-  }
-  defaultFilter = localStorage.getItem('todo_default_filter') || 'all';
-  // If the saved default points at a tag that no longer exists, fall back
-  // to "All" rather than showing an empty list on launch.
-  if (defaultFilter !== 'all' && !tags.includes(defaultFilter)) {
-    defaultFilter = 'all';
   }
 }
 
@@ -1423,7 +1302,6 @@ function escHtml(s) {
 // ── Rendering ────────────────────────────────────────────────────────────────
 function render() {
   renderTabs();
-  renderFilterBar();
   renderList();
   updateSubtitle();
 }
@@ -1441,11 +1319,6 @@ function renderTabs() {
   });
 }
 
-// Tasks in scope for the tag filter bar on the current tab.
-function viewScopeTasks() {
-  return tasks.filter(t => !t.completed && (view === 'someday' ? t.someday : !t.someday));
-}
-
 function updateSubtitle() {
   const el = document.getElementById('subtitle');
   if (view === 'today') {
@@ -1459,29 +1332,6 @@ function updateSubtitle() {
     el.textContent = active.length === 0 ? 'All done ✓'
       : `${active.length} active` + (later ? ` · ${later} later` : '');
   }
-}
-
-function renderFilterBar() {
-  const bar = document.getElementById('filterBar');
-  if (view === 'today') { bar.style.display = 'none'; return; }
-  bar.style.display = 'flex';
-  const scope = viewScopeTasks();
-  const counts = {};
-  scope.forEach(t => {
-    (t.tags || []).forEach(tag => { counts[tag] = (counts[tag] || 0) + 1; });
-  });
-  const totalActive = scope.length;
-
-  const allActive = activeFilter === 'all';
-  let html = `<div class="pill ${allActive ? 'active' : ''}" onclick="setFilter('all')">All<span class="pill-count">${totalActive}</span></div>`;
-
-  tags.forEach(tag => {
-    const sel = activeFilter === tag;
-    const cnt = counts[tag] || 0;
-    html += `<div class="pill ${sel ? 'active' : ''}" onclick="setFilter('${escHtml(tag)}')">${escHtml(tag)}<span class="pill-count">${cnt}</span></div>`;
-  });
-
-  bar.innerHTML = html;
 }
 
 function isLater(t) {
@@ -1584,7 +1434,7 @@ function toggleOverflow() {
 }
 
 function renderAll(area) {
-  const filtered = tasks.filter(t => !t.someday && (activeFilter === 'all' || (t.tags || []).includes(activeFilter)));
+  const filtered = tasks.filter(t => !t.someday);
   const active = filtered.filter(t => !t.completed);
   const later = active.filter(isLater).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
   const soon = active.filter(t => !isLater(t)).sort(compareTasks);
@@ -1626,7 +1476,7 @@ function toggleLater() {
 
 function renderSomeday(area) {
   const list = tasks
-    .filter(t => !t.completed && t.someday && (activeFilter === 'all' || (t.tags || []).includes(activeFilter)))
+    .filter(t => !t.completed && t.someday)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   if (list.length === 0) {
     area.innerHTML = `<div class="empty-state"><div class="emoji">💭</div><p>Nothing parked here.<br>Tasks with no date and Low urgency land in Someday,<br>or use “Move to Someday” from the nudge.</p></div>`;
@@ -1645,10 +1495,6 @@ function taskCardHTML(task, opts = {}) {
     ? (!!task.dueDate && daysUntil(task.dueDate) < 0)
     : (isOverdueAlert(task) || urg === 'critical'));
   const blocksCount = !checked ? countBlockedTasks(task.id) : 0;
-
-  const tagsHtml = (task.tags && task.tags.length > 0)
-    ? `<div class="task-tags">${task.tags.map(t => `<span class="tag-chip">${escHtml(t)}</span>`).join('')}</div>`
-    : '';
 
   let badges = '';
   if (due && !checked) {
@@ -1701,18 +1547,12 @@ function taskCardHTML(task, opts = {}) {
           ${extra}
         </div>
         ${notesShown ? `<div class="task-notes">${escHtml(notesShown)}</div>` : ''}
-        ${tagsHtml}
         ${badgesHtml}
       </div>
     </div>`;
 }
 
 // ── Filters ──────────────────────────────────────────────────────────────────
-function setFilter(tag) {
-  activeFilter = tag;
-  render();
-}
-
 function toggleDone() {
   doneCollapsed = !doneCollapsed;
   renderList();
@@ -1917,21 +1757,6 @@ function clearDone() {
 }
 
 // ── Task Modal ────────────────────────────────────────────────────────────────
-function renderTagChips() {
-  const container = document.getElementById('fTagChips');
-  container.innerHTML = tags.map(t => {
-    const active = selectedTags.includes(t);
-    return `<div class="tag-sel-chip ${active ? 'active' : ''}" onclick="toggleTagChip('${escHtml(t)}')">${escHtml(t)}</div>`;
-  }).join('');
-}
-
-function toggleTagChip(tag) {
-  const idx = selectedTags.indexOf(tag);
-  if (idx === -1) selectedTags.push(tag);
-  else selectedTags.splice(idx, 1);
-  renderTagChips();
-}
-
 function openAdd() {
   editingId = null;
   selectedUrgency = 'medium';
@@ -1944,8 +1769,6 @@ function openAdd() {
   document.getElementById('taskDeleteBtn').style.display = 'none';
   document.getElementById('taskDeleteDivider').style.display = 'none';
   resetDeleteConfirm();
-  selectedTags = [];
-  renderTagChips();
   highlightUrgency('medium');
   selectedBlockedBy = null;
   renderBlockedByField();
@@ -1973,8 +1796,6 @@ function openEdit(id) {
   document.getElementById('taskDeleteDivider').style.display = 'block';
   resetDeleteConfirm();
 
-  selectedTags = [...(t.tags || [])];
-  renderTagChips();
   if (t.dueDate) showAutoBadge(t.dueDate);
   else document.getElementById('autoBadge').textContent = '';
   highlightUrgency(t.urgency);
@@ -1992,7 +1813,6 @@ function saveTask() {
   const title = document.getElementById('fTitle').value.trim();
   if (!title) { snack('Please enter a task title'); return; }
 
-  const taskTags  = [...selectedTags];
   const dueDate   = document.getElementById('fDue').value || null;
   const notes     = document.getElementById('fNotes').value.trim();
   const urgency   = selectedUrgency;
@@ -2021,14 +1841,14 @@ function saveTask() {
     const t = existing;
     const pushCount = due !== t.dueDate ? 0 : (t.pushCount || 0);
     Object.assign(t, {
-      title, tags: taskTags, urgency, dueDate: due, notes, blockedBy,
+      title, urgency, dueDate: due, notes, blockedBy,
       repeat, repeatN, repeatDay, someday, pushCount,
       updatedAt: new Date().toISOString()
     });
     snack('Task updated');
   } else {
     tasks.unshift({
-      id: uid(), title, tags: taskTags, urgency, dueDate: due, notes, blockedBy,
+      id: uid(), title, tags: [], urgency, dueDate: due, notes, blockedBy,
       repeat, repeatN, repeatDay, someday, pushCount: 0, nudged: false,
       completed: false, completedOn: null,
       createdAt: new Date().toISOString()
@@ -2181,76 +2001,11 @@ function countBlockedTasks(taskId) {
 
 // ── Settings Modal ────────────────────────────────────────────────────────────
 function openSettings() {
-  renderTagList();
-  renderDefaultFilterChips();
   openModal('settingsModal');
 }
 
 function closeSettings() {
   closeModal('settingsModal');
-}
-
-function renderTagList() {
-  const container = document.getElementById('tagChips');
-  container.innerHTML = tags.map(t => `
-    <div class="cat-chip-edit">
-      ${escHtml(t)}
-      <button onclick="removeTag('${escHtml(t)}')" title="Remove">×</button>
-    </div>`).join('');
-}
-
-// ── Default View (the filter shown on launch) ─────────────────────────────────
-function renderDefaultFilterChips() {
-  const container = document.getElementById('defaultFilterChips');
-  const options = ['all', ...tags];
-  container.innerHTML = options.map(opt => {
-    const label  = opt === 'all' ? 'All' : opt;
-    const active = defaultFilter === opt;
-    return `<div class="tag-sel-chip ${active ? 'active' : ''}" onclick="setDefaultFilter('${escHtml(opt)}')">${escHtml(label)}</div>`;
-  }).join('');
-}
-
-function setDefaultFilter(val) {
-  defaultFilter = val;
-  save();
-  renderDefaultFilterChips();
-  snack(`Default view set to ${val === 'all' ? 'All' : val}`);
-}
-
-function addTag() {
-  const input = document.getElementById('newTagInput');
-  const name  = input.value.trim();
-  if (!name) return;
-  if (tags.includes(name)) { snack('Tag already exists'); return; }
-  tags.push(name);
-  save();
-  input.value = '';
-  renderTagList();
-  renderDefaultFilterChips();
-  render();
-  snack(`"${name}" added`);
-}
-
-function removeTag(name) {
-  const affectedCount = tasks.filter(t => (t.tags || []).includes(name)).length;
-  tags = tags.filter(t => t !== name);
-  // Strip the removed tag from any tasks that had it — they don't get
-  // deleted or hidden, they just fall back to showing under "All".
-  tasks.forEach(t => {
-    if (t.tags && t.tags.includes(name)) {
-      t.tags = t.tags.filter(tg => tg !== name);
-    }
-  });
-  // If the removed tag was the default launch view, fall back to "All"
-  // rather than pointing at a tag that no longer exists.
-  if (defaultFilter === name) defaultFilter = 'all';
-  save();
-  renderTagList();
-  renderDefaultFilterChips();
-  render();
-  snack(affectedCount > 0
-    ? `"${name}" removed — ${affectedCount} task${affectedCount !== 1 ? 's' : ''} moved to All`
-    : `"${name}" removed`);
 }
 
 // ── Force Update ──────────────────────────────────────────────────────────────
@@ -2298,9 +2053,6 @@ document.getElementById('taskCancelBtn').addEventListener('click', () => closeMo
 document.getElementById('fTitle').addEventListener('keydown', e => {
   if (e.key === 'Enter') saveTask();
 });
-document.getElementById('newTagInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addTag();
-});
 
 // ── Service Worker ────────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -2314,8 +2066,6 @@ if ('serviceWorker' in navigator) {
 // ── Init ──────────────────────────────────────────────────────────────────────
 load();
 migrate();
-// Open on the saved default view (falls back to "All" if that tag's gone).
-activeFilter = (defaultFilter === 'all' || tags.includes(defaultFilter)) ? defaultFilter : 'all';
 localStorage.setItem('todo_version', VERSION);
 document.getElementById('versionLabel').textContent = `v${VERSION}`;
 render();

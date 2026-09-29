@@ -11,7 +11,6 @@ A simple, fast, urgency-based to-do app — built as a PWA so it installs on any
 - **Someday** — tasks with no due date and Low urgency are parked on their own tab, off the main list
 - **Stale-task nudge** — after a task is pushed to tomorrow 3 times you're asked to do it, break it down, park it or delete it
 - **Checklists in notes** — start a line with `- [ ]` and it becomes a tappable checkbox; cards show progress like `☑ 2/4`
-- Tag tasks with one or more tags to organize and filter them
 - Urgency levels: Critical, High, Medium, Low (auto-set from due date, or set manually)
 - Due dates with overdue alerts
 - Works offline via Service Worker caching
