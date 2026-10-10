@@ -1,5 +1,5 @@
 // ── To-Do PWA Service Worker ──────────────────────────────────────────────────
-const CACHE_VERSION = 'todo-v3.0';
+const CACHE_VERSION = 'todo-v3.0.1';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -10,7 +10,10 @@ const ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_VERSION)
-      .then(cache => cache.addAll(ASSETS))
+      // cache:'reload' skips the browser HTTP cache so we never store a stale copy
+      .then(cache => Promise.all(ASSETS.map(a =>
+        fetch(new Request(a, { cache: 'reload' })).then(r => cache.put(a, r))
+      )))
       .then(() => self.skipWaiting())
   );
 });
@@ -31,19 +34,16 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch: cache-first strategy
+// Fetch: network-first (falls back to cache offline) so updates show up straight away
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
-        }
+    fetch(event.request, { cache: 'no-cache' }).then(response => {
+      if (response && response.status === 200 && response.type === 'basic') {
         const toCache = response.clone();
         caches.open(CACHE_VERSION).then(cache => cache.put(event.request, toCache));
-        return response;
-      });
-    })
+      }
+      return response;
+    }).catch(() => caches.match(event.request))
   );
 });
