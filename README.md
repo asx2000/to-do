@@ -4,15 +4,10 @@ A simple, fast, urgency-based to-do app — built as a PWA so it installs on any
 
 ## Features
 
-- **Today view** — a focused list of at most 5 tasks a day (overdue first, then by urgency). Repeating tasks live in their own "Routines" strip and don't count toward the 5. Anything beyond the cap waits under "More due today"; each task can be pushed to tomorrow
-- **Repeating tasks** — daily, weekly, monthly or every N days. Checking one off rolls it to its next due date (counted from the old due date)
-- **Chains** — mark a task "blocked by" another; only the current step of a chain shows on Today ("⛓ Step 1 of 3 · next: Review")
-- **Later** — tasks due more than 7 days out fold into a collapsed "Later" section on All tasks
-- **Someday** — tasks with no due date and Low urgency are parked on their own tab, off the main list
-- **Stale-task nudge** — after a task is pushed to tomorrow 3 times you're asked to do it, break it down, park it or delete it
+- **Three tabs: Day, Week, All** — each task is tagged Day (do today), Week (do this week) or None; the tab shows what you tagged. All shows everything, Day tasks first
+- No due dates, repeats or chains — just tick the task's "When" and get on with it
 - **Checklists in notes** — start a line with `- [ ]` and it becomes a tappable checkbox; cards show progress like `☑ 2/4`
-- Urgency levels: Critical, High, Medium, Low (auto-set from due date, or set manually)
-- Due dates with overdue alerts
+- Urgency levels: Critical, High, Medium, Low (set manually)
 - Works offline via Service Worker caching
 - Installable on iOS, Android, and desktop
 - Dark mode support (follows system preference)
@@ -36,4 +31,4 @@ To install as an app, open it in Chrome or Safari and use the browser's "Add to 
 - `manifest.json` — PWA manifest (name, icons, display mode)
 - `sw.js` — Service Worker for offline caching
 - `icon.svg` — app icon
-- `PLAN.md` — the v2.0 simplification plan (single task entity, tags, dependencies)
+- `PLAN.md` — the earlier v2.0 simplification plan (historical)

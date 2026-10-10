@@ -1,5 +1,5 @@
 // ── To-Do PWA Service Worker ──────────────────────────────────────────────────
-const CACHE_VERSION = 'todo-v2.2';
+const CACHE_VERSION = 'todo-v3.0';
 const ASSETS = [
   './index.html',
   './manifest.json',
