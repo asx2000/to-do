@@ -221,7 +221,9 @@
       flex-shrink: 0;
     }
     .urgency-bar.urgent { background: var(--critical-bar); }
-    .urgency-bar.normal { background: var(--low-bar); }
+    .urgency-bar.normal { background: var(--good); }
+    .task-card.normal { border-color: var(--good); }
+    .task-card.urgent { border-color: var(--critical); }
 
     .task-main {
       flex: 1;
@@ -462,7 +464,7 @@
     }
     .urgency-opt .u-icon { font-size: 18px; display: block; margin-bottom: 3px; }
     .urgency-opt.sel-urgent { background: var(--critical-soft); border-color: var(--critical); color: var(--critical); }
-    .urgency-opt.sel-normal { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .urgency-opt.sel-normal { border-color: var(--good); color: var(--good); background: var(--good-soft); }
 
     /* Auto urgency indicator */
     .auto-badge {
@@ -844,7 +846,7 @@
           <span class="u-icon">🔴</span>Urgent
         </div>
         <div class="urgency-opt" data-u="normal" onclick="selectUrgency('normal')">
-          <span class="u-icon">⚪</span>Normal
+          <span class="u-icon">🟢</span>Normal
         </div>
       </div>
     </div>
@@ -1161,7 +1163,7 @@ function taskCardHTML(task) {
   const notesShown = plainNotes(task.notes);
 
   return `
-    <div class="task-card ${checked ? 'done' : ''} ${alert ? 'alert-pulse' : ''}" id="card-${task.id}" onclick="openEdit('${task.id}')">
+    <div class="task-card ${task.urgency} ${checked ? 'done' : ''} ${alert ? 'alert-pulse' : ''}" id="card-${task.id}" onclick="openEdit('${task.id}')">
       ${alert ? '<div class="alert-dot"></div>' : ''}
       <div class="urgency-bar ${task.urgency}"></div>
       <div class="task-main">
