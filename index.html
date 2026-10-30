@@ -220,10 +220,8 @@
       width: 5px;
       flex-shrink: 0;
     }
-    .urgency-bar.critical { background: var(--critical-bar); }
-    .urgency-bar.high     { background: var(--high-bar); }
-    .urgency-bar.medium   { background: var(--medium-bar); }
-    .urgency-bar.low      { background: var(--low-bar); }
+    .urgency-bar.urgent { background: var(--critical-bar); }
+    .urgency-bar.normal { background: var(--low-bar); }
 
     .task-main {
       flex: 1;
@@ -447,7 +445,7 @@
     /* Urgency selector */
     .urgency-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
 
@@ -463,10 +461,8 @@
       -webkit-tap-highlight-color: transparent;
     }
     .urgency-opt .u-icon { font-size: 18px; display: block; margin-bottom: 3px; }
-    .urgency-opt.sel-critical { background: var(--critical-soft); border-color: var(--critical); color: var(--critical); }
-    .urgency-opt.sel-high     { background: var(--high-soft);     border-color: var(--high);     color: var(--high); }
-    .urgency-opt.sel-medium   { background: var(--medium-soft);   border-color: var(--medium-bar); color: #b89000; }
-    .urgency-opt.sel-low      { border-color: var(--border); color: var(--text2); background: var(--surface2); }
+    .urgency-opt.sel-urgent { background: var(--critical-soft); border-color: var(--critical); color: var(--critical); }
+    .urgency-opt.sel-normal { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 
     /* Auto urgency indicator */
     .auto-badge {
@@ -761,6 +757,18 @@
     .push-btn:active { opacity: 0.6; }
     .tbadge-chain  { background: var(--good-soft); color: var(--good); }
     .tbadge-check  { background: var(--surface2); color: var(--text2); }
+    .tbadge-part   { background: var(--accent-soft); color: var(--accent); }
+
+    /* ── "Part of" project filter + field ── */
+    .part-filter { display: flex; gap: 7px; padding: 10px 16px 0; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
+    .part-filter::-webkit-scrollbar { display: none; }
+    .part-chip {
+      padding: 5px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;
+      border: 1.5px solid var(--border); background: var(--surface); color: var(--text2);
+      white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .part-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .part-suggest { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
     .tbadge-pushed { background: var(--critical-soft); color: var(--critical); }
     .tbadge-repeat { background: var(--accent-soft); color: var(--accent); }
 
@@ -808,6 +816,7 @@
       <div class="tab" data-view="all" onclick="setView('all')">All</div>
     </div>
   </div>
+  <div class="part-filter" id="partFilter" style="display:none"></div>
   <div class="list-area" id="listArea"></div>
 </div>
 
@@ -823,19 +832,19 @@
     </div>
 
     <div class="form-group">
+      <label>Part of (optional)</label>
+      <input type="text" id="fPart" placeholder="e.g. Kitchen, Japan trip" maxlength="40" autocomplete="off" oninput="renderPartSuggest()" />
+      <div class="part-suggest" id="fPartSuggest"></div>
+    </div>
+
+    <div class="form-group">
       <label>Urgency</label>
       <div class="urgency-grid" id="urgencyGrid">
-        <div class="urgency-opt" data-u="critical" onclick="selectUrgency('critical')">
-          <span class="u-icon">🔴</span>Critical
+        <div class="urgency-opt" data-u="urgent" onclick="selectUrgency('urgent')">
+          <span class="u-icon">🔴</span>Urgent
         </div>
-        <div class="urgency-opt" data-u="high" onclick="selectUrgency('high')">
-          <span class="u-icon">🟠</span>High
-        </div>
-        <div class="urgency-opt" data-u="medium" onclick="selectUrgency('medium')">
-          <span class="u-icon">🟡</span>Medium
-        </div>
-        <div class="urgency-opt" data-u="low" onclick="selectUrgency('low')">
-          <span class="u-icon">⚪</span>Low
+        <div class="urgency-opt" data-u="normal" onclick="selectUrgency('normal')">
+          <span class="u-icon">⚪</span>Normal
         </div>
       </div>
     </div>
@@ -895,7 +904,7 @@
 
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
-const VERSION = '3.0';
+const VERSION = '3.1';
 
 // ── State ────────────────────────────────────────────────────────────────────
 // Every task has a `scope`: 'day' (do today), 'week' (do this week) or 'all'
@@ -903,9 +912,10 @@ const VERSION = '3.0';
 let tasks = [];
 let view = 'day';            // 'day' | 'week' | 'all'
 let editingId = null;
-let selectedUrgency = 'medium';
+let selectedUrgency = 'normal';
 let selectedScope = 'day';
 let doneCollapsed = false;
+let partFilter = null;       // project name currently filtered on, or null
 let deleteConfirmPending = false;
 let deleteConfirmTimer = null;
 
@@ -934,7 +944,6 @@ function migrate() {
   if (prev === VERSION) return;
 
   tasks.forEach(t => {
-    if (!t.urgency) t.urgency = 'medium';
     if (!t.createdAt) t.createdAt = new Date().toISOString();
     if (!t.scope) {
       let d = null;
@@ -944,9 +953,11 @@ function migrate() {
       if (t.someday) t.scope = 'all';
       else if (d !== null && d <= 0) t.scope = 'day';
       else if (d !== null && d <= 7) t.scope = 'week';
-      else if (d === null && t.urgency === 'critical') t.scope = 'day';
+      else if (d === null && (t.urgency === 'critical' || t.urgency === 'urgent')) t.scope = 'day';
       else t.scope = 'all';
     }
+    // v3.1: four urgency levels collapse to two — critical/high → urgent, the rest → normal.
+    t.urgency = ['critical', 'high', 'urgent'].includes(t.urgency) ? 'urgent' : 'normal';
     ['dueDate', 'repeat', 'repeatN', 'repeatDay', 'blockedBy', 'someday', 'pushCount',
      'nudged', 'focusDate', 'completedOn', 'tags'].forEach(k => delete t[k]);
   });
@@ -963,8 +974,7 @@ function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-const URGENCY_LABEL = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
-const URGENCY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
+const URGENCY_ORDER = { urgent: 0, normal: 1 };
 
 let snackTimer = null;
 function snack(msg, ms = 2200, action = null) {
@@ -1018,6 +1028,7 @@ function toggleCkLine(notes, idx) {
 // ── Rendering ────────────────────────────────────────────────────────────────
 function render() {
   renderTabs();
+  renderPartFilter();
   renderList();
   updateSubtitle();
 }
@@ -1061,9 +1072,56 @@ function compareAll(a, b) {
   return so !== 0 ? so : compareTasks(a, b);
 }
 
+// ── "Part of" projects ───────────────────────────────────────────────────────
+// A project is just a shared free-text label on tasks (t.part) — no separate entity.
+function partNames() {
+  return [...new Set(tasks.filter(t => t.part).map(t => t.part))].sort((a, b) => a.localeCompare(b));
+}
+
+// Reuse an existing spelling so "kitchen" and "Kitchen" don't become two projects.
+function canonPart(name) {
+  const n = name.trim().replace(/\s+/g, ' ');
+  if (!n) return '';
+  const hit = tasks.find(t => t.part && t.part.toLowerCase() === n.toLowerCase());
+  return hit ? hit.part : n;
+}
+
+function setPartFilter(name) {
+  partFilter = partFilter === name ? null : name;
+  render();
+}
+
+function renderPartFilter() {
+  const el = document.getElementById('partFilter');
+  const names = partNames();
+  if (partFilter && !names.includes(partFilter)) partFilter = null;
+  if (names.length === 0) { el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  el.innerHTML = `<span class="part-chip ${partFilter ? '' : 'active'}" onclick="partFilter = null; render()">All</span>` +
+    names.map(n => {
+      const open = tasks.filter(t => t.part === n && !t.completed).length;
+      const all = tasks.filter(t => t.part === n).length;
+      return `<span class="part-chip ${partFilter === n ? 'active' : ''}" data-part="${escHtml(n)}" onclick="setPartFilter(this.dataset.part)">📁 ${escHtml(n)} ${all - open}/${all}</span>`;
+    }).join('');
+}
+
+function renderPartSuggest() {
+  const val = document.getElementById('fPart').value.trim().toLowerCase();
+  document.getElementById('fPartSuggest').innerHTML = partNames().map(n => {
+    const on = n.toLowerCase() === val;
+    return `<div class="tag-sel-chip ${on ? 'active' : ''}" data-part="${escHtml(n)}" onclick="pickPart(this.dataset.part)">${escHtml(n)}</div>`;
+  }).join('');
+}
+
+function pickPart(name) {
+  const inp = document.getElementById('fPart');
+  inp.value = inp.value.trim().toLowerCase() === name.toLowerCase() ? '' : name;
+  renderPartSuggest();
+}
+
 function renderList() {
   const area = document.getElementById('listArea');
-  const inView = tasks.filter(t => view === 'all' || t.scope === view);
+  const inView = tasks.filter(t => (view === 'all' || t.scope === view) && (!partFilter || t.part === partFilter));
   const active = inView.filter(t => !t.completed).sort(view === 'all' ? compareAll : compareTasks);
   const done = inView.filter(t => t.completed)
     .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
@@ -1086,11 +1144,14 @@ function renderList() {
 
 function taskCardHTML(task) {
   const checked = task.completed;
-  const alert = !checked && task.urgency === 'critical';
+  const alert = !checked && task.urgency === 'urgent';
 
   let badges = '';
   if (view === 'all' && task.scope !== 'all') {
     badges += `<span class="tbadge tbadge-due">${SCOPE_LABEL[task.scope]}</span>`;
+  }
+  if (task.part) {
+    badges += `<span class="tbadge tbadge-part">📁 ${escHtml(task.part)}</span>`;
   }
   const ck = checklistStats(task.notes);
   if (ck.total > 0) {
@@ -1197,16 +1258,18 @@ function clearDone() {
 // ── Task Modal ────────────────────────────────────────────────────────────────
 function openAdd() {
   editingId = null;
-  selectedUrgency = 'medium';
+  selectedUrgency = 'normal';
   selectedScope = view;   // adding from a tab files the task under that tab
   document.getElementById('modalTitle').textContent = 'New Task';
   document.getElementById('fTitle').value = '';
   document.getElementById('fNotes').value = '';
+  document.getElementById('fPart').value = partFilter || '';
+  renderPartSuggest();
   document.getElementById('taskSaveBtn').textContent = 'Save Task';
   document.getElementById('taskDeleteBtn').style.display = 'none';
   document.getElementById('taskDeleteDivider').style.display = 'none';
   resetDeleteConfirm();
-  highlightUrgency('medium');
+  highlightUrgency('normal');
   renderScopeField();
   renderChecklist();
   openModal('taskModal');
@@ -1223,6 +1286,8 @@ function openEdit(id) {
   document.getElementById('modalTitle').textContent = 'Edit Task';
   document.getElementById('fTitle').value = t.title;
   document.getElementById('fNotes').value = t.notes || '';
+  document.getElementById('fPart').value = t.part || '';
+  renderPartSuggest();
   document.getElementById('taskSaveBtn').textContent = 'Save Changes';
   document.getElementById('taskDeleteBtn').style.display = 'flex';
   document.getElementById('taskDeleteDivider').style.display = 'block';
@@ -1238,17 +1303,18 @@ function saveTask() {
   if (!title) { snack('Please enter a task title'); return; }
 
   const notes = document.getElementById('fNotes').value.trim();
+  const part = canonPart(document.getElementById('fPart').value);
   const existing = editingId ? tasks.find(t => t.id === editingId) : null;
 
   if (existing) {
     Object.assign(existing, {
-      title, notes, urgency: selectedUrgency, scope: selectedScope,
+      title, notes, part, urgency: selectedUrgency, scope: selectedScope,
       updatedAt: new Date().toISOString()
     });
     snack('Task updated');
   } else {
     tasks.unshift({
-      id: uid(), title, notes, urgency: selectedUrgency, scope: selectedScope,
+      id: uid(), title, notes, part, urgency: selectedUrgency, scope: selectedScope,
       completed: false, createdAt: new Date().toISOString()
     });
     snack('Task added');
