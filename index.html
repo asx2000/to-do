@@ -220,10 +220,8 @@
       width: 5px;
       flex-shrink: 0;
     }
-    .urgency-bar.critical { background: var(--critical-bar); }
-    .urgency-bar.high     { background: var(--high-bar); }
-    .urgency-bar.medium   { background: var(--medium-bar); }
-    .urgency-bar.low      { background: var(--low-bar); }
+    .urgency-bar.urgent { background: var(--critical-bar); }
+    .urgency-bar.normal { background: var(--low-bar); }
 
     .task-main {
       flex: 1;
@@ -447,7 +445,7 @@
     /* Urgency selector */
     .urgency-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
 
@@ -463,10 +461,8 @@
       -webkit-tap-highlight-color: transparent;
     }
     .urgency-opt .u-icon { font-size: 18px; display: block; margin-bottom: 3px; }
-    .urgency-opt.sel-critical { background: var(--critical-soft); border-color: var(--critical); color: var(--critical); }
-    .urgency-opt.sel-high     { background: var(--high-soft);     border-color: var(--high);     color: var(--high); }
-    .urgency-opt.sel-medium   { background: var(--medium-soft);   border-color: var(--medium-bar); color: #b89000; }
-    .urgency-opt.sel-low      { border-color: var(--border); color: var(--text2); background: var(--surface2); }
+    .urgency-opt.sel-urgent { background: var(--critical-soft); border-color: var(--critical); color: var(--critical); }
+    .urgency-opt.sel-normal { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 
     /* Auto urgency indicator */
     .auto-badge {
@@ -844,17 +840,11 @@
     <div class="form-group">
       <label>Urgency</label>
       <div class="urgency-grid" id="urgencyGrid">
-        <div class="urgency-opt" data-u="critical" onclick="selectUrgency('critical')">
-          <span class="u-icon">🔴</span>Critical
+        <div class="urgency-opt" data-u="urgent" onclick="selectUrgency('urgent')">
+          <span class="u-icon">🔴</span>Urgent
         </div>
-        <div class="urgency-opt" data-u="high" onclick="selectUrgency('high')">
-          <span class="u-icon">🟠</span>High
-        </div>
-        <div class="urgency-opt" data-u="medium" onclick="selectUrgency('medium')">
-          <span class="u-icon">🟡</span>Medium
-        </div>
-        <div class="urgency-opt" data-u="low" onclick="selectUrgency('low')">
-          <span class="u-icon">⚪</span>Low
+        <div class="urgency-opt" data-u="normal" onclick="selectUrgency('normal')">
+          <span class="u-icon">⚪</span>Normal
         </div>
       </div>
     </div>
@@ -914,7 +904,7 @@
 
 <script>
 // ── Version ───────────────────────────────────────────────────────────────────
-const VERSION = '3.0';
+const VERSION = '3.1';
 
 // ── State ────────────────────────────────────────────────────────────────────
 // Every task has a `scope`: 'day' (do today), 'week' (do this week) or 'all'
@@ -922,7 +912,7 @@ const VERSION = '3.0';
 let tasks = [];
 let view = 'day';            // 'day' | 'week' | 'all'
 let editingId = null;
-let selectedUrgency = 'medium';
+let selectedUrgency = 'normal';
 let selectedScope = 'day';
 let doneCollapsed = false;
 let partFilter = null;       // project name currently filtered on, or null
@@ -954,7 +944,6 @@ function migrate() {
   if (prev === VERSION) return;
 
   tasks.forEach(t => {
-    if (!t.urgency) t.urgency = 'medium';
     if (!t.createdAt) t.createdAt = new Date().toISOString();
     if (!t.scope) {
       let d = null;
@@ -964,9 +953,11 @@ function migrate() {
       if (t.someday) t.scope = 'all';
       else if (d !== null && d <= 0) t.scope = 'day';
       else if (d !== null && d <= 7) t.scope = 'week';
-      else if (d === null && t.urgency === 'critical') t.scope = 'day';
+      else if (d === null && (t.urgency === 'critical' || t.urgency === 'urgent')) t.scope = 'day';
       else t.scope = 'all';
     }
+    // v3.1: four urgency levels collapse to two — critical/high → urgent, the rest → normal.
+    t.urgency = ['critical', 'high', 'urgent'].includes(t.urgency) ? 'urgent' : 'normal';
     ['dueDate', 'repeat', 'repeatN', 'repeatDay', 'blockedBy', 'someday', 'pushCount',
      'nudged', 'focusDate', 'completedOn', 'tags'].forEach(k => delete t[k]);
   });
@@ -983,8 +974,7 @@ function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-const URGENCY_LABEL = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
-const URGENCY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
+const URGENCY_ORDER = { urgent: 0, normal: 1 };
 
 let snackTimer = null;
 function snack(msg, ms = 2200, action = null) {
@@ -1154,7 +1144,7 @@ function renderList() {
 
 function taskCardHTML(task) {
   const checked = task.completed;
-  const alert = !checked && task.urgency === 'critical';
+  const alert = !checked && task.urgency === 'urgent';
 
   let badges = '';
   if (view === 'all' && task.scope !== 'all') {
@@ -1268,7 +1258,7 @@ function clearDone() {
 // ── Task Modal ────────────────────────────────────────────────────────────────
 function openAdd() {
   editingId = null;
-  selectedUrgency = 'medium';
+  selectedUrgency = 'normal';
   selectedScope = view;   // adding from a tab files the task under that tab
   document.getElementById('modalTitle').textContent = 'New Task';
   document.getElementById('fTitle').value = '';
@@ -1279,7 +1269,7 @@ function openAdd() {
   document.getElementById('taskDeleteBtn').style.display = 'none';
   document.getElementById('taskDeleteDivider').style.display = 'none';
   resetDeleteConfirm();
-  highlightUrgency('medium');
+  highlightUrgency('normal');
   renderScopeField();
   renderChecklist();
   openModal('taskModal');

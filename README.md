@@ -8,7 +8,7 @@ A simple, fast, urgency-based to-do app — built as a PWA so it installs on any
 - No due dates, repeats or chains — just tick the task's "When" and get on with it
 - **Checklists in notes** — start a line with `- [ ]` and it becomes a tappable checkbox; cards show progress like `☑ 2/4`
 - **Part of** — an optional free-text project label (e.g. "Kitchen") shown as a 📁 chip on cards; tap a 📁 chip under the tabs to filter to one project (with done/total progress)
-- Urgency levels: Critical, High, Medium, Low (set manually)
+- Urgency: Urgent or Normal (set manually) — urgent tasks sort first, get a red bar and a pulsing alert
 - Works offline via Service Worker caching
 - Installable on iOS, Android, and desktop
 - Dark mode support (follows system preference)
