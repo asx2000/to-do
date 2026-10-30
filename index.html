@@ -761,6 +761,18 @@
     .push-btn:active { opacity: 0.6; }
     .tbadge-chain  { background: var(--good-soft); color: var(--good); }
     .tbadge-check  { background: var(--surface2); color: var(--text2); }
+    .tbadge-part   { background: var(--accent-soft); color: var(--accent); }
+
+    /* ── "Part of" project filter + field ── */
+    .part-filter { display: flex; gap: 7px; padding: 10px 16px 0; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
+    .part-filter::-webkit-scrollbar { display: none; }
+    .part-chip {
+      padding: 5px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;
+      border: 1.5px solid var(--border); background: var(--surface); color: var(--text2);
+      white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .part-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .part-suggest { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
     .tbadge-pushed { background: var(--critical-soft); color: var(--critical); }
     .tbadge-repeat { background: var(--accent-soft); color: var(--accent); }
 
@@ -808,6 +820,7 @@
       <div class="tab" data-view="all" onclick="setView('all')">All</div>
     </div>
   </div>
+  <div class="part-filter" id="partFilter" style="display:none"></div>
   <div class="list-area" id="listArea"></div>
 </div>
 
@@ -820,6 +833,12 @@
     <div class="form-group">
       <label>Task</label>
       <input type="text" id="fTitle" placeholder="What needs to be done?" maxlength="120" />
+    </div>
+
+    <div class="form-group">
+      <label>Part of (optional)</label>
+      <input type="text" id="fPart" placeholder="e.g. Kitchen, Japan trip" maxlength="40" autocomplete="off" oninput="renderPartSuggest()" />
+      <div class="part-suggest" id="fPartSuggest"></div>
     </div>
 
     <div class="form-group">
@@ -906,6 +925,7 @@ let editingId = null;
 let selectedUrgency = 'medium';
 let selectedScope = 'day';
 let doneCollapsed = false;
+let partFilter = null;       // project name currently filtered on, or null
 let deleteConfirmPending = false;
 let deleteConfirmTimer = null;
 
@@ -1018,6 +1038,7 @@ function toggleCkLine(notes, idx) {
 // ── Rendering ────────────────────────────────────────────────────────────────
 function render() {
   renderTabs();
+  renderPartFilter();
   renderList();
   updateSubtitle();
 }
@@ -1061,9 +1082,56 @@ function compareAll(a, b) {
   return so !== 0 ? so : compareTasks(a, b);
 }
 
+// ── "Part of" projects ───────────────────────────────────────────────────────
+// A project is just a shared free-text label on tasks (t.part) — no separate entity.
+function partNames() {
+  return [...new Set(tasks.filter(t => t.part).map(t => t.part))].sort((a, b) => a.localeCompare(b));
+}
+
+// Reuse an existing spelling so "kitchen" and "Kitchen" don't become two projects.
+function canonPart(name) {
+  const n = name.trim().replace(/\s+/g, ' ');
+  if (!n) return '';
+  const hit = tasks.find(t => t.part && t.part.toLowerCase() === n.toLowerCase());
+  return hit ? hit.part : n;
+}
+
+function setPartFilter(name) {
+  partFilter = partFilter === name ? null : name;
+  render();
+}
+
+function renderPartFilter() {
+  const el = document.getElementById('partFilter');
+  const names = partNames();
+  if (partFilter && !names.includes(partFilter)) partFilter = null;
+  if (names.length === 0) { el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  el.innerHTML = `<span class="part-chip ${partFilter ? '' : 'active'}" onclick="partFilter = null; render()">All</span>` +
+    names.map(n => {
+      const open = tasks.filter(t => t.part === n && !t.completed).length;
+      const all = tasks.filter(t => t.part === n).length;
+      return `<span class="part-chip ${partFilter === n ? 'active' : ''}" data-part="${escHtml(n)}" onclick="setPartFilter(this.dataset.part)">📁 ${escHtml(n)} ${all - open}/${all}</span>`;
+    }).join('');
+}
+
+function renderPartSuggest() {
+  const val = document.getElementById('fPart').value.trim().toLowerCase();
+  document.getElementById('fPartSuggest').innerHTML = partNames().map(n => {
+    const on = n.toLowerCase() === val;
+    return `<div class="tag-sel-chip ${on ? 'active' : ''}" data-part="${escHtml(n)}" onclick="pickPart(this.dataset.part)">${escHtml(n)}</div>`;
+  }).join('');
+}
+
+function pickPart(name) {
+  const inp = document.getElementById('fPart');
+  inp.value = inp.value.trim().toLowerCase() === name.toLowerCase() ? '' : name;
+  renderPartSuggest();
+}
+
 function renderList() {
   const area = document.getElementById('listArea');
-  const inView = tasks.filter(t => view === 'all' || t.scope === view);
+  const inView = tasks.filter(t => (view === 'all' || t.scope === view) && (!partFilter || t.part === partFilter));
   const active = inView.filter(t => !t.completed).sort(view === 'all' ? compareAll : compareTasks);
   const done = inView.filter(t => t.completed)
     .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
@@ -1091,6 +1159,9 @@ function taskCardHTML(task) {
   let badges = '';
   if (view === 'all' && task.scope !== 'all') {
     badges += `<span class="tbadge tbadge-due">${SCOPE_LABEL[task.scope]}</span>`;
+  }
+  if (task.part) {
+    badges += `<span class="tbadge tbadge-part">📁 ${escHtml(task.part)}</span>`;
   }
   const ck = checklistStats(task.notes);
   if (ck.total > 0) {
@@ -1202,6 +1273,8 @@ function openAdd() {
   document.getElementById('modalTitle').textContent = 'New Task';
   document.getElementById('fTitle').value = '';
   document.getElementById('fNotes').value = '';
+  document.getElementById('fPart').value = partFilter || '';
+  renderPartSuggest();
   document.getElementById('taskSaveBtn').textContent = 'Save Task';
   document.getElementById('taskDeleteBtn').style.display = 'none';
   document.getElementById('taskDeleteDivider').style.display = 'none';
@@ -1223,6 +1296,8 @@ function openEdit(id) {
   document.getElementById('modalTitle').textContent = 'Edit Task';
   document.getElementById('fTitle').value = t.title;
   document.getElementById('fNotes').value = t.notes || '';
+  document.getElementById('fPart').value = t.part || '';
+  renderPartSuggest();
   document.getElementById('taskSaveBtn').textContent = 'Save Changes';
   document.getElementById('taskDeleteBtn').style.display = 'flex';
   document.getElementById('taskDeleteDivider').style.display = 'block';
@@ -1238,17 +1313,18 @@ function saveTask() {
   if (!title) { snack('Please enter a task title'); return; }
 
   const notes = document.getElementById('fNotes').value.trim();
+  const part = canonPart(document.getElementById('fPart').value);
   const existing = editingId ? tasks.find(t => t.id === editingId) : null;
 
   if (existing) {
     Object.assign(existing, {
-      title, notes, urgency: selectedUrgency, scope: selectedScope,
+      title, notes, part, urgency: selectedUrgency, scope: selectedScope,
       updatedAt: new Date().toISOString()
     });
     snack('Task updated');
   } else {
     tasks.unshift({
-      id: uid(), title, notes, urgency: selectedUrgency, scope: selectedScope,
+      id: uid(), title, notes, part, urgency: selectedUrgency, scope: selectedScope,
       completed: false, createdAt: new Date().toISOString()
     });
     snack('Task added');
